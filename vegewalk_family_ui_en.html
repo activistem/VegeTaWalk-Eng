@@ -1,0 +1,3201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vege Ta Walk — FamilyMonitoring Dashboard</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --blue-dark:   #1a4a7a;
+    --blue-mid:    #2e6db0;
+    --blue-light:  #a8c8f0;
+    --blue-pale:   #edf4fc;
+    --green-dark:  #2d6b3a;
+    --green-mid:   #4a9e58;
+    --green-light: #a8ddb2;
+    --green-pale:  #edf7ef;
+    --orange:      #e07b3a;
+    --orange-pale: #fdf0e6;
+    --red:         #c0392b;
+    --red-pale:    #fdecea;
+    --earth:       #8b6914;
+    --earth-light: #f5e9c8;
+    --text-dark:   #1e2a3a;
+    --text-mid:    #4a5e70;
+    --text-light:  #8a9eb0;
+    --bg:          #f4f7fb;
+    --card:        #ffffff;
+    --border:      #d4e2f0;
+    --shadow:      0 2px 12px rgba(30,74,122,0.09);
+    --shadow-lg:   0 4px 24px rgba(30,74,122,0.14);
+  }
+
+  body {
+    font-family: 'Segoe UI', Arial, 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    background: var(--bg);
+    color: var(--text-dark);
+    min-height: 100vh;
+  }
+
+  .layout { display: flex; min-height: 100vh; }
+
+  /* ====== SIDEBAR ====== */
+  .sidebar {
+    width: 230px;
+    background: var(--blue-dark);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+
+  .sidebar-logo {
+    padding: 26px 20px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+    text-align: center;
+  }
+
+  .sidebar-logo .logo-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  .sidebar-logo .app-icon { font-size: 28px; }
+
+  .sidebar-logo h1 {
+    color: #fff;
+    font-size: 17px;
+    font-weight: 700;
+  }
+
+  .sidebar-logo .mode-badge {
+    display: inline-block;
+    background: rgba(168,200,240,0.25);
+    color: var(--blue-light);
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+    border: 1px solid rgba(168,200,240,0.35);
+  }
+
+  .parent-profile {
+    padding: 18px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .pp-avatar {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: var(--blue-light);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+    border: 2px solid rgba(255,255,255,0.3);
+    flex-shrink: 0;
+  }
+
+  .pp-info { flex: 1; }
+
+  .pp-name {
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+
+  .pp-sub {
+    color: var(--blue-light);
+    font-size: 11px;
+  }
+
+  .pp-status {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 5px;
+    font-size: 11px;
+    color: #6ee78e;
+    font-weight: 600;
+  }
+
+  .pp-status .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #6ee78e;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  nav { flex: 1; padding: 14px 0; }
+
+  nav a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 22px;
+    color: rgba(255,255,255,0.70);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.18s;
+    border-left: 3px solid transparent;
+  }
+
+  nav a .nav-ico { font-size: 17px; }
+
+  nav a:hover { background: rgba(255,255,255,0.09); color: #fff; }
+
+  nav a.active {
+    background: rgba(255,255,255,0.14);
+    color: #fff;
+    border-left-color: var(--blue-light);
+    font-weight: 700;
+  }
+
+  .sidebar-foot {
+    padding: 16px;
+    border-top: 1px solid rgba(255,255,255,0.12);
+  }
+
+  .sidebar-foot a {
+    display: flex; align-items: center; gap: 8px;
+    color: rgba(255,255,255,0.55);
+    text-decoration: none; font-size: 13px; padding: 7px 4px;
+  }
+
+  /* ====== MAIN ====== */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  .topbar {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .topbar-left h2 { font-size: 21px; font-weight: 700; color: var(--blue-dark); }
+  .topbar-left .sub { font-size: 12px; color: var(--text-light); margin-top: 2px; }
+
+  .topbar-right { display: flex; align-items: center; gap: 14px; }
+
+  .last-update {
+    font-size: 12px;
+    color: var(--text-light);
+    background: var(--blue-pale);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 13px;
+  }
+
+  .notif-btn {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--card);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .notif-dot {
+    position: absolute; top: 6px; right: 6px;
+    width: 8px; height: 8px;
+    background: var(--orange);
+    border-radius: 50%;
+    border: 2px solid #fff;
+  }
+
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--blue-mid); color: #fff;
+    border: none; border-radius: 10px;
+    padding: 9px 18px; font-size: 13px; font-weight: 700;
+    cursor: pointer; transition: background 0.18s;
+    font-family: inherit; text-decoration: none;
+  }
+
+  .btn-primary:hover { background: var(--blue-dark); }
+
+  .btn-ghost {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: transparent; color: var(--blue-mid);
+    border: 1.5px solid var(--blue-light);
+    border-radius: 10px; padding: 8px 16px;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all 0.18s;
+    font-family: inherit; text-decoration: none;
+  }
+
+  .btn-ghost:hover { background: var(--blue-pale); border-color: var(--blue-mid); }
+
+  /* ====== CONTENT ====== */
+  .content { flex: 1; overflow-y: auto; padding: 28px 36px 36px; }
+
+  /* ====== ALERT BANNER ====== */
+  .alert-banner {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: linear-gradient(90deg, #fff8f0, #fff3ea);
+    border: 1.5px solid #f0b97a;
+    border-radius: 13px;
+    padding: 14px 20px;
+    margin-bottom: 24px;
+  }
+
+  .alert-banner .ab-icon { font-size: 26px; }
+  .alert-banner .ab-text { flex: 1; }
+  .alert-banner .ab-text strong { font-size: 14px; color: var(--orange); display: block; }
+  .alert-banner .ab-text span { font-size: 12px; color: #8a6a40; }
+
+  /* ====== SUMMARY ====== */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .sum-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 18px 20px;
+    box-shadow: var(--shadow);
+  }
+
+  .sum-card .s-icon { font-size: 24px; margin-bottom: 8px; display: block; }
+  .sum-card .s-label { font-size: 11px; color: var(--text-light); font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 4px; }
+  .sum-card .s-val { font-size: 30px; font-weight: 800; color: var(--blue-dark); line-height: 1; }
+  .sum-card .s-unit { font-size: 13px; font-weight: 500; color: var(--text-mid); margin-left: 2px; }
+  .sum-card .s-sub { font-size: 11px; color: var(--text-light); margin-top: 5px; }
+
+  .sum-card.good { border-color: var(--green-light); background: var(--green-pale); }
+  .sum-card.good .s-val { color: var(--green-dark); }
+
+  .sum-card.warn { border-color: #f0b97a; background: var(--orange-pale, #fff8f0); }
+  .sum-card.warn .s-val { color: var(--orange); }
+
+  /* ====== MAIN GRID ====== */
+  .mid-grid {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    gap: 20px;
+    margin-bottom: 22px;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 18px;
+    padding: 22px 24px;
+    box-shadow: var(--shadow);
+  }
+
+  .sec-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--blue-dark);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .sec-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  /* ====== STEP TIMELINE ====== */
+  .step-today-hero {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 18px;
+    padding: 16px 18px;
+    background: linear-gradient(135deg, var(--blue-pale), #f0f6ff);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+
+  .sth-left { text-align: center; min-width: 80px; }
+  .sth-steps { font-size: 40px; font-weight: 800; color: var(--blue-dark); line-height: 1; }
+  .sth-label { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+
+  .sth-divider { width: 1px; height: 50px; background: var(--border); }
+
+  .sth-right { flex: 1; }
+  .sth-row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px; }
+  .sth-row .k { color: var(--text-mid); }
+  .sth-row .v { font-weight: 700; color: var(--blue-dark); }
+
+  .sth-bar { height: 8px; background: #e0ecf8; border-radius: 99px; overflow: hidden; margin-top: 4px; }
+  .sth-bar-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--blue-light), var(--blue-mid)); }
+
+  .sth-comment {
+    font-size: 13px;
+    color: var(--green-dark);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* Weekly chart */
+  .week-label { font-size: 13px; font-weight: 600; color: var(--text-mid); margin-bottom: 10px; }
+
+  .week-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 80px;
+    margin-bottom: 6px;
+  }
+
+  .wc-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+  .wc-bar-wrap { flex: 1; width: 100%; display: flex; align-items: flex-end; }
+  .wc-bar { width: 100%; border-radius: 5px 5px 0 0; background: var(--blue-light); }
+  .wc-bar.goal { background: var(--green-mid); }
+  .wc-bar.low { background: #f0b97a; }
+  .wc-day { font-size: 11px; color: var(--text-light); font-weight: 500; }
+  .wc-day.today-l { color: var(--blue-dark); font-weight: 700; }
+
+  .week-legend {
+    display: flex; gap: 14px; font-size: 11px; color: var(--text-light); margin-top: 6px;
+  }
+
+  .wl-item { display: flex; align-items: center; gap: 4px; }
+  .wl-dot { width: 10px; height: 10px; border-radius: 3px; }
+
+  /* ====== ACTIVITY LOG ====== */
+  .activity-list { display: flex; flex-direction: column; gap: 0; }
+
+  .activity-item {
+    display: flex;
+    gap: 12px;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .activity-item:last-child { border-bottom: none; }
+
+  .ai-time { font-size: 12px; color: var(--text-light); min-width: 52px; padding-top: 2px; }
+
+  .ai-icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .ai-icon.blue { background: var(--blue-pale); }
+  .ai-icon.green { background: var(--green-pale); }
+  .ai-icon.orange { background: #fff3ea; }
+
+  .ai-body { flex: 1; }
+  .ai-title { font-size: 13px; font-weight: 600; color: var(--text-dark); margin-bottom: 2px; }
+  .ai-sub { font-size: 12px; color: var(--text-light); }
+
+  .ai-badge {
+    font-size: 11px; font-weight: 700;
+    padding: 3px 10px; border-radius: 20px;
+    align-self: flex-start;
+  }
+
+  .ai-badge.blue { background: var(--blue-pale); color: var(--blue-mid); }
+  .ai-badge.green { background: var(--green-pale); color: var(--green-dark); }
+  .ai-badge.orange { background: #fff3ea; color: var(--orange); }
+
+  /* ====== HEALTH STATUS ====== */
+  .health-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+
+  .health-item {
+    background: var(--blue-pale);
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    padding: 12px 14px;
+  }
+
+  .health-item .hi-label { font-size: 11px; color: var(--text-light); margin-bottom: 4px; }
+  .health-item .hi-val { font-size: 20px; font-weight: 800; color: var(--blue-dark); }
+  .health-item .hi-unit { font-size: 12px; color: var(--text-mid); margin-left: 2px; }
+  .health-item .hi-sub { font-size: 11px; color: var(--text-light); margin-top: 3px; }
+
+  .health-item.ok { background: var(--green-pale); border-color: var(--green-light); }
+  .health-item.ok .hi-val { color: var(--green-dark); }
+
+  .health-item.warn { background: #fff8f0; border-color: #f0b97a; }
+  .health-item.warn .hi-val { color: var(--orange); }
+
+  /* ====== CHECKUP STATUS ====== */
+  .checkup-card {
+    background: linear-gradient(135deg, var(--green-dark) 0%, var(--green-mid) 100%);
+    border-radius: 12px;
+    padding: 16px 18px;
+    color: #fff;
+    margin-bottom: 12px;
+  }
+
+  .cc-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .cc-label { font-size: 12px; opacity: 0.85; }
+  .cc-done { font-size: 11px; background: rgba(255,255,255,0.2); padding: 3px 10px; border-radius: 20px; font-weight: 600; }
+  .cc-name { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+  .cc-date { font-size: 12px; opacity: 0.8; }
+
+  .checkup-next {
+    background: #fff8f0;
+    border: 1.5px solid #f0b97a;
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .cn-icon { font-size: 22px; }
+  .cn-info { flex: 1; }
+  .cn-title { font-size: 13px; font-weight: 700; color: var(--orange); margin-bottom: 2px; }
+  .cn-date { font-size: 12px; color: #8a6a40; }
+
+  /* ====== BOTTOM GRID ====== */
+  .bot-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+
+  /* ====== POINT HISTORY ====== */
+  .pt-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 12px;
+    background: var(--blue-pale);
+    border-radius: 9px;
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+
+  .pt-row .pt-ico { font-size: 16px; }
+  .pt-row .pt-desc { flex: 1; color: var(--text-mid); font-size: 12px; }
+  .pt-row .pt-pts { font-weight: 700; color: var(--blue-dark); }
+  .pt-row .pt-date { font-size: 11px; color: var(--text-light); }
+
+  .point-total {
+    background: linear-gradient(135deg, var(--blue-dark), var(--blue-mid));
+    border-radius: 12px;
+    padding: 16px 18px;
+    color: #fff;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .pt-total-label { font-size: 12px; opacity: 0.8; margin-bottom: 4px; }
+  .pt-total-val { font-size: 34px; font-weight: 800; line-height: 1; }
+  .pt-total-unit { font-size: 14px; opacity: 0.85; margin-left: 3px; }
+  .pt-coin { font-size: 44px; opacity: 0.3; }
+
+  /* ====== MESSAGES ====== */
+  .msg-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .msg-item {
+    background: var(--blue-pale);
+    border-radius: 11px;
+    padding: 12px 14px;
+    border-left: 3px solid var(--blue-mid);
+  }
+
+  .msg-item.new { border-left-color: var(--orange); background: #fff8f0; }
+  .msg-item.admin { border-left-color: var(--green-mid); background: var(--green-pale); }
+
+  .msg-header { display: flex; justify-content: space-between; margin-bottom: 4px; }
+  .msg-from { font-size: 12px; font-weight: 700; color: var(--text-dark); }
+  .msg-date { font-size: 11px; color: var(--text-light); }
+  .msg-body { font-size: 12px; color: var(--text-mid); line-height: 1.5; }
+
+  /* ====== SEND MSG ====== */
+  .send-box {
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-top: 14px;
+  }
+
+  .send-box textarea {
+    width: 100%; padding: 12px 14px;
+    font-size: 13px; font-family: inherit;
+    border: none; outline: none; resize: none;
+    background: #fff; color: var(--text-dark);
+    min-height: 60px;
+  }
+
+  .send-box-footer {
+    background: var(--blue-pale);
+    padding: 8px 12px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+
+  .send-box-footer span { font-size: 11px; color: var(--text-light); }
+
+  /* ====== MONTH CALENDAR MINI ====== */
+  .cal-mini {
+    font-size: 12px;
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .cal-mini th {
+    text-align: center;
+    color: var(--text-light);
+    font-weight: 600;
+    padding: 4px 2px;
+    font-size: 11px;
+  }
+
+  .cal-mini td {
+    text-align: center;
+    padding: 5px 2px;
+    color: var(--text-mid);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .cal-mini td:hover { background: var(--blue-pale); }
+  .cal-mini td.walk { background: var(--green-pale); color: var(--green-dark); font-weight: 700; }
+  .cal-mini td.miss { background: #fff3ea; color: var(--orange); }
+  .cal-mini td.today { background: var(--blue-mid); color: #fff; font-weight: 700; border-radius: 50%; }
+  .cal-mini td.checkup { position: relative; }
+  .cal-mini td.checkup::after {
+    content: '🏥';
+    font-size: 8px;
+    position: absolute;
+    bottom: 0; right: 1px;
+  }
+
+  /* ====== COUNSELOR DASHBOARD ====== */
+  --purple:       #5a3a8a;
+  --purple-mid:   #7a5ab0;
+  --purple-light: #c0a8e0;
+  --purple-pale:  #f4f0fb;
+
+  .counselor-section {
+    margin-top: 28px;
+  }
+
+  .counselor-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid #e8e0f4;
+  }
+
+  .counselor-section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #5a3a8a;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .counselor-section-title .cs-badge {
+    font-size: 11px;
+    background: #f4f0fb;
+    color: #7a5ab0;
+    border: 1px solid #c0a8e0;
+    border-radius: 20px;
+    padding: 3px 11px;
+    font-weight: 600;
+  }
+
+  .counselor-section-sub {
+    font-size: 12px;
+    color: var(--text-light);
+    margin-top: 3px;
+  }
+
+  /* Session tabs */
+  .session-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+
+  .session-tab {
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1.5px solid #d8ccea;
+    background: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-mid);
+    cursor: pointer;
+    transition: all 0.16s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .session-tab:hover {
+    border-color: #7a5ab0;
+    color: #5a3a8a;
+    background: #f4f0fb;
+  }
+
+  .session-tab.active {
+    background: #5a3a8a;
+    border-color: #5a3a8a;
+    color: #fff;
+  }
+
+  .session-tab .tab-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.7;
+  }
+
+  /* 3-column counselor grid */
+  .counselor-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 18px;
+    margin-bottom: 20px;
+  }
+
+  .c-card {
+    background: #fff;
+    border: 1.5px solid #e0d4f4;
+    border-radius: 16px;
+    padding: 20px 22px;
+    box-shadow: 0 2px 12px rgba(90,58,138,0.08);
+  }
+
+  .c-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #ede8f8;
+  }
+
+  .c-card-icon {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .c-card-icon.health { background: #fff0f4; }
+  .c-card-icon.worry  { background: #fff8e8; }
+  .c-card-icon.chat   { background: #eef6ff; }
+
+  .c-card-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #5a3a8a;
+    line-height: 1.3;
+  }
+
+  .c-card-date {
+    font-size: 11px;
+    color: var(--text-light);
+    margin-top: 1px;
+  }
+
+  /* Health status gauge */
+  .health-gauge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+  }
+
+  .gauge-wrap {
+    position: relative;
+    width: 100px; height: 56px;
+    overflow: hidden;
+  }
+
+  .gauge-bg {
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    border: 12px solid #ede8f8;
+    position: absolute;
+    top: 0; left: 0;
+    clip-path: inset(0 0 50% 0);
+  }
+
+  .gauge-fg {
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    border: 12px solid #7a5ab0;
+    position: absolute;
+    top: 0; left: 0;
+    clip-path: inset(0 0 50% 0);
+    transform-origin: 50px 50px;
+    transform: rotate(var(--gauge-rot, -90deg));
+    transition: transform 0.8s ease;
+  }
+
+  .gauge-label {
+    position: absolute;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    font-size: 16px; font-weight: 800; color: #5a3a8a;
+    white-space: nowrap;
+  }
+
+  .health-score-row {
+    text-align: center;
+    margin-bottom: 12px;
+  }
+
+  .health-score-num {
+    font-size: 38px;
+    font-weight: 800;
+    color: #5a3a8a;
+    line-height: 1;
+  }
+
+  .health-score-max {
+    font-size: 14px;
+    color: var(--text-light);
+    margin-left: 2px;
+  }
+
+  .health-score-label {
+    font-size: 11px;
+    color: var(--text-light);
+    margin-top: 2px;
+  }
+
+  .health-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+  }
+
+  .h-chip {
+    font-size: 11px;
+    padding: 4px 11px;
+    border-radius: 20px;
+    font-weight: 600;
+    border: 1.5px solid transparent;
+  }
+
+  .h-chip.good { background: #eaf7ee; color: #2d6b3a; border-color: #a8ddb2; }
+  .h-chip.warn { background: #fff8f0; color: #b85a1a; border-color: #f0c090; }
+  .h-chip.note { background: #f4f0fb; color: #5a3a8a; border-color: #c0a8e0; }
+
+  /* Worry list */
+  .worry-list {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .worry-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    padding: 10px 12px;
+    background: #fefcf0;
+    border: 1px solid #f0dca0;
+    border-radius: 10px;
+  }
+
+  .wi-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+  .wi-body { flex: 1; }
+  .wi-title { font-size: 13px; font-weight: 600; color: var(--text-dark); margin-bottom: 2px; }
+  .wi-detail { font-size: 11px; color: var(--text-mid); line-height: 1.5; }
+
+  .wi-level {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+    align-self: flex-start;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .wi-level.high { background: #fdecea; color: #b83232; }
+  .wi-level.mid  { background: #fff3ea; color: #b85a1a; }
+  .wi-level.low  { background: #f4f0fb; color: #5a3a8a; }
+
+  /* Chat tendencies */
+  .chat-topic-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .ct-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .ct-label {
+    font-size: 12px;
+    color: var(--text-mid);
+    min-width: 80px;
+  }
+
+  .ct-bar-wrap {
+    flex: 1;
+    background: #ede8f8;
+    border-radius: 99px;
+    height: 10px;
+    overflow: hidden;
+  }
+
+  .ct-bar {
+    height: 100%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, #c0a8e0, #7a5ab0);
+  }
+
+  .ct-pct {
+    font-size: 11px;
+    font-weight: 700;
+    color: #5a3a8a;
+    min-width: 32px;
+    text-align: right;
+  }
+
+  .chat-memo {
+    background: #f4f0fb;
+    border: 1px solid #d8ccea;
+    border-radius: 10px;
+    padding: 10px 13px;
+    font-size: 12px;
+    color: var(--text-mid);
+    line-height: 1.6;
+  }
+
+  .chat-memo .cm-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #5a3a8a;
+    margin-bottom: 4px;
+  }
+
+  /* Session history timeline */
+  .session-timeline {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-top: 6px;
+  }
+
+  .st-item {
+    background: #fff;
+    border: 1.5px solid #e0d4f4;
+    border-radius: 13px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: all 0.16s;
+  }
+
+  .st-item:hover {
+    border-color: #7a5ab0;
+    box-shadow: 0 4px 14px rgba(90,58,138,0.13);
+  }
+
+  .st-item.current {
+    border-color: #5a3a8a;
+    background: #f4f0fb;
+  }
+
+  .st-date { font-size: 12px; font-weight: 700; color: #5a3a8a; margin-bottom: 6px; }
+  .st-event { font-size: 12px; color: var(--text-mid); margin-bottom: 8px; }
+
+  .st-scores {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .st-score-chip {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-weight: 600;
+  }
+
+  .st-score-chip.health { background: #eaf7ee; color: #2d6b3a; }
+  .st-score-chip.worry  { background: #fff3ea; color: #b85a1a; }
+  .st-score-chip.chat   { background: #eef6ff; color: #1a5ab0; }
+
+  .counselor-note-full {
+    background: linear-gradient(135deg, #f8f4ff, #f0f6ff);
+    border: 1.5px solid #d0c0f0;
+    border-radius: 14px;
+    padding: 18px 22px;
+    margin-top: 18px;
+  }
+
+  .cnf-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .cnf-icon { font-size: 22px; }
+
+  .cnf-title { font-size: 14px; font-weight: 700; color: #5a3a8a; }
+  .cnf-date  { font-size: 11px; color: var(--text-light); }
+
+  .cnf-body {
+    font-size: 13px;
+    color: var(--text-mid);
+    line-height: 1.8;
+  }
+
+  .cnf-body strong { color: #5a3a8a; font-weight: 700; }
+
+  /* ====== PAGE SWITCHING ====== */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ====== STEPS PAGE ====== */
+  .filter-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .filter-tab {
+    padding: 8px 20px;
+    border-radius: 20px;
+    border: 1.5px solid var(--border);
+    background: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-mid);
+    cursor: pointer;
+    transition: all 0.16s;
+  }
+  .filter-tab.active {
+    background: var(--blue-mid);
+    border-color: var(--blue-mid);
+    color: #fff;
+  }
+  .filter-tab:hover:not(.active) { background: var(--blue-pale); }
+
+  .steps-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .steps-table th {
+    background: var(--blue-pale);
+    color: var(--blue-dark);
+    font-weight: 700;
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 2px solid var(--border);
+    font-size: 12px;
+  }
+  .steps-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-mid);
+  }
+  .steps-table tr:hover td { background: var(--blue-pale); }
+  .steps-table .steps-val { font-weight: 700; color: var(--blue-dark); }
+  .steps-table .intensity-high { color: var(--green-dark); font-weight: 600; }
+  .steps-table .intensity-mid { color: var(--blue-mid); font-weight: 600; }
+  .steps-table .intensity-low { color: var(--orange); font-weight: 600; }
+
+  .comparison-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 24px;
+    height: 120px;
+    padding: 0 16px;
+    margin-bottom: 8px;
+  }
+  .cc-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .cc-bar-wrap {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: 100px;
+  }
+  .cc-bar-item {
+    width: 28px;
+    border-radius: 5px 5px 0 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+  }
+  .cc-label-w { font-size: 11px; color: var(--text-light); margin-top: 4px; }
+
+  .time-pattern {
+    display: flex;
+    gap: 12px;
+  }
+  .tp-item {
+    flex: 1;
+    background: var(--blue-pale);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    text-align: center;
+  }
+  .tp-time { font-size: 12px; color: var(--text-light); margin-bottom: 6px; }
+  .tp-icon { font-size: 24px; margin-bottom: 6px; }
+  .tp-level { font-size: 13px; font-weight: 700; }
+  .tp-level.high { color: var(--green-dark); }
+  .tp-level.mid { color: var(--blue-mid); }
+  .tp-level.low { color: var(--orange); }
+
+  /* ====== CALENDAR PAGE ====== */
+  .cal-full {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .cal-full th {
+    text-align: center;
+    padding: 10px;
+    font-size: 13px;
+    color: var(--text-mid);
+    font-weight: 700;
+    background: var(--blue-pale);
+    border: 1px solid var(--border);
+  }
+  .cal-full td {
+    text-align: center;
+    padding: 8px 4px;
+    border: 1px solid var(--border);
+    vertical-align: top;
+    min-width: 60px;
+    height: 70px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .cal-full td:hover { opacity: 0.8; }
+  .cal-full .cal-day-num { font-size: 14px; font-weight: 700; display: block; margin-bottom: 4px; }
+  .cal-full .cal-steps { font-size: 11px; font-weight: 600; display: block; }
+  .cal-full .cal-note { font-size: 10px; display: block; margin-top: 2px; }
+  .cal-full td.cal-green-dark { background: #2d6b3a; color: #fff; }
+  .cal-full td.cal-green-mid { background: #c8eacc; color: #1a4a22; }
+  .cal-full td.cal-amber { background: #fff3cd; color: #856404; }
+  .cal-full td.cal-pale { background: #fff8f0; color: #8a6a40; }
+  .cal-full td.cal-future { background: #f0f0f0; color: #aaa; cursor: default; }
+  .cal-full td.cal-empty { background: #fafafa; cursor: default; }
+  .cal-full td.cal-today { outline: 3px solid var(--blue-mid); outline-offset: -2px; }
+  .cal-full td.cal-special { position: relative; }
+  .cal-full td.cal-special::after {
+    content: attr(data-special);
+    font-size: 9px;
+    display: block;
+    margin-top: 2px;
+    opacity: 0.85;
+  }
+
+  .cal-legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+    font-size: 12px;
+  }
+  .cl-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-mid);
+  }
+  .cl-dot {
+    width: 14px; height: 14px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  /* ====== CHECKUP PAGE ====== */
+  .next-checkup-card {
+    background: linear-gradient(135deg, #1a4a7a, #2e6db0);
+    border-radius: 16px;
+    padding: 22px 24px;
+    color: #fff;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .nc-icon { font-size: 48px; }
+  .nc-info { flex: 1; }
+  .nc-label { font-size: 12px; opacity: 0.8; margin-bottom: 4px; }
+  .nc-title { font-size: 20px; font-weight: 800; margin-bottom: 6px; }
+  .nc-details { font-size: 13px; opacity: 0.9; line-height: 1.7; }
+  .nc-badge {
+    background: #6ee78e;
+    color: #1a4a22;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 6px 16px;
+    border-radius: 20px;
+  }
+
+  .checkup-hist-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .checkup-hist-table th {
+    background: var(--blue-pale);
+    color: var(--blue-dark);
+    font-weight: 700;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 2px solid var(--border);
+    font-size: 12px;
+  }
+  .checkup-hist-table td {
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-mid);
+  }
+  .checkup-hist-table tr:hover td { background: var(--blue-pale); }
+
+  .reminder-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .rt-item {
+    display: flex;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .rt-item:last-child { border-bottom: none; }
+  .rt-date { font-size: 11px; color: var(--text-light); min-width: 70px; }
+  .rt-from { font-size: 11px; font-weight: 700; color: var(--blue-mid); min-width: 80px; }
+  .rt-msg { flex: 1; color: var(--text-mid); }
+
+  /* ====== POINTS PAGE ====== */
+  .points-hero {
+    background: linear-gradient(135deg, var(--blue-dark), var(--blue-mid));
+    border-radius: 18px;
+    padding: 28px 32px;
+    color: #fff;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 28px;
+  }
+  .ph-main { flex: 1; }
+  .ph-label { font-size: 13px; opacity: 0.8; margin-bottom: 6px; }
+  .ph-value { font-size: 64px; font-weight: 800; line-height: 1; }
+  .ph-unit { font-size: 22px; margin-left: 4px; opacity: 0.8; }
+  .ph-coin { font-size: 72px; opacity: 0.25; }
+  .ph-progress { flex: 1; }
+  .ph-prog-label { font-size: 12px; opacity: 0.85; margin-bottom: 8px; }
+  .ph-prog-bar { height: 12px; background: rgba(255,255,255,0.25); border-radius: 99px; overflow: hidden; margin-bottom: 6px; }
+  .ph-prog-fill { height: 100%; background: #6ee78e; border-radius: 99px; }
+  .ph-prog-sub { font-size: 11px; opacity: 0.75; }
+
+  .points-earn-chart {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    height: 80px;
+    margin-bottom: 8px;
+  }
+  .pec-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+  }
+  .pec-bars {
+    display: flex;
+    gap: 4px;
+    align-items: flex-end;
+    height: 60px;
+  }
+  .pec-bar {
+    width: 20px;
+    border-radius: 4px 4px 0 0;
+  }
+  .pec-bar.walk { background: var(--blue-light); }
+  .pec-bar.checkup { background: var(--green-mid); }
+  .pec-month { font-size: 11px; color: var(--text-light); }
+
+  .points-hist-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .points-hist-table th {
+    background: var(--blue-pale);
+    color: var(--blue-dark);
+    font-weight: 700;
+    padding: 9px 12px;
+    text-align: left;
+    border-bottom: 2px solid var(--border);
+    font-size: 12px;
+  }
+  .points-hist-table td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-mid);
+  }
+  .points-hist-table .gain { color: var(--green-dark); font-weight: 700; }
+  .points-hist-table .lose { color: var(--red); font-weight: 700; }
+  .points-hist-table tr:hover td { background: var(--blue-pale); }
+
+  /* ====== MESSAGES PAGE ====== */
+  .chat-container {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 16px;
+    background: #f7f9fc;
+    border-radius: 14px;
+    border: 1.5px solid var(--border);
+    min-height: 400px;
+    margin-bottom: 16px;
+  }
+  .chat-bubble {
+    display: flex;
+    gap: 10px;
+    max-width: 75%;
+  }
+  .chat-bubble.family { align-self: flex-end; flex-direction: row-reverse; }
+  .chat-bubble.parent { align-self: flex-start; }
+  .chat-bubble.system { align-self: center; max-width: 90%; }
+  .cb-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+    background: var(--blue-pale);
+    border: 2px solid var(--border);
+  }
+  .cb-content { display: flex; flex-direction: column; gap: 4px; }
+  .chat-bubble.family .cb-content { align-items: flex-end; }
+  .cb-name { font-size: 11px; color: var(--text-light); font-weight: 600; }
+  .cb-text {
+    font-size: 13px;
+    padding: 10px 14px;
+    border-radius: 14px;
+    line-height: 1.55;
+    color: var(--text-dark);
+  }
+  .chat-bubble.family .cb-text {
+    background: var(--blue-mid);
+    color: #fff;
+    border-radius: 14px 4px 14px 14px;
+  }
+  .chat-bubble.parent .cb-text {
+    background: #fff;
+    border: 1.5px solid var(--border);
+    border-radius: 4px 14px 14px 14px;
+  }
+  .chat-bubble.system .cb-text {
+    background: #fff8e8;
+    border: 1px solid #f0dca0;
+    border-radius: 10px;
+    font-size: 12px;
+    color: #7a5a20;
+    text-align: center;
+    width: 100%;
+  }
+  .cb-time { font-size: 10px; color: var(--text-light); }
+
+  .quick-templates {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .qt-btn {
+    padding: 7px 14px;
+    border-radius: 20px;
+    border: 1.5px solid var(--blue-light);
+    background: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--blue-mid);
+    cursor: pointer;
+    transition: all 0.16s;
+  }
+  .qt-btn:hover { background: var(--blue-pale); border-color: var(--blue-mid); }
+
+  /* ====== ALERTS PAGE ====== */
+  .alert-settings-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+  .alert-settings-table th {
+    background: var(--blue-pale);
+    color: var(--blue-dark);
+    font-weight: 700;
+    padding: 11px 14px;
+    text-align: left;
+    border-bottom: 2px solid var(--border);
+    font-size: 12px;
+  }
+  .alert-settings-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-mid);
+    vertical-align: middle;
+  }
+  .alert-settings-table tr:hover td { background: var(--blue-pale); }
+
+  .toggle {
+    position: relative;
+    display: inline-block;
+    width: 44px; height: 24px;
+  }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: #ccc;
+    border-radius: 24px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .toggle-slider::before {
+    content: '';
+    position: absolute;
+    width: 18px; height: 18px;
+    left: 3px; top: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.2s;
+  }
+  .toggle input:checked + .toggle-slider { background: var(--green-mid); }
+  .toggle input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+  .notif-method-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .notif-method {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    background: #fff;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .notif-method.active {
+    border-color: var(--blue-mid);
+    background: var(--blue-pale);
+    color: var(--blue-dark);
+    font-weight: 700;
+  }
+
+  .alert-hist-item {
+    display: flex;
+    gap: 12px;
+    padding: 11px 14px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 8px;
+    align-items: center;
+  }
+  .ahi-icon { font-size: 18px; }
+  .ahi-body { flex: 1; }
+  .ahi-title { font-size: 13px; font-weight: 600; color: var(--text-dark); margin-bottom: 2px; }
+  .ahi-sub { font-size: 11px; color: var(--text-light); }
+  .ahi-date { font-size: 11px; color: var(--text-light); }
+  .ahi-badge {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+  .ahi-badge.triggered { background: var(--orange-pale); color: var(--orange); }
+  .ahi-badge.ok { background: var(--green-pale); color: var(--green-dark); }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-row">
+        <span class="app-icon">🥦</span>
+        <h1>Vege Ta Walk</h1>
+      </div>
+      <span class="mode-badge">👨‍👩‍👧 Family monitoring</span>
+    </div>
+
+    <div class="parent-profile">
+      <div class="pp-avatar">👴</div>
+      <div class="pp-info">
+        <div class="pp-name">Masao Tanaka.</div>
+        <div class="pp-sub">75years old / Shingu City</div>
+        <div class="pp-status">
+          <span class="dot"></span>
+          Today Active
+        </div>
+      </div>
+    </div>
+
+    <nav>
+      <a href="#" class="active" data-page="dashboard">
+        <span class="nav-ico">🏠</span> Dashboard
+      </a>
+      <a href="#" data-page="steps">
+        <span class="nav-ico">👟</span> Walking Records
+      </a>
+      <a href="#" data-page="calendar">
+        <span class="nav-ico">📅</span> Monthly Calendar
+      </a>
+      <a href="#" data-page="checkup">
+        <span class="nav-ico">🏥</span> Checkup Schedule
+      </a>
+      <a href="#" data-page="points">
+        <span class="nav-ico">🌟</span> Points Status
+      </a>
+      <a href="#" data-page="messages">
+        <span class="nav-ico">💬</span> Messages
+      </a>
+      <a href="#" data-page="alerts">
+        <span class="nav-ico">🔔</span> Alert Settings
+      </a>
+      <a href="#" data-page="counselor">
+        <span class="nav-ico">🧑‍⚕️</span> Counselor Records
+      </a>
+    </nav>
+
+    <div class="sidebar-foot">
+      <a href="#">⚙️ Settings</a>
+      <a href="#">👤 Edit Profile</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <h2>Masao Tanaka.のMonitoring Dashboard</h2>
+        <div class="sub">Last updated：20266/28Sun 14:32 ／ Auto-refresh: every 5 min</div>
+      </div>
+      <div class="topbar-right">
+        <div class="last-update">🔄 14:32 Updated</div>
+        <a href="#" class="btn-primary">💬 MessagesSend</a>
+        <div class="notif-btn">🔔<span class="notif-dot"></span></div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- ====== PAGE: DASHBOARD ====== -->
+      <div class="page active" id="page-dashboard">
+
+      <!-- ALERT -->
+      <div class="alert-banner">
+        <span class="ab-icon">⚠️</span>
+        <div class="ab-text">
+          <strong>Yesterday（6/27）はstep count was low — 3,200 steps</strong>
+          <span>The weather may have been poor。Todayは7,500 stepsexceeded！Let's keep watching over them。</span>
+        </div>
+        <a href="#" class="btn-ghost" style="font-size:12px; padding:6px 12px; white-space:nowrap;">View details</a>
+      </div>
+
+      <!-- SUMMARY CARDS -->
+      <div class="summary-grid">
+        <div class="sum-card good">
+          <span class="s-icon">👟</span>
+          <div class="s-label">TodayのSteps</div>
+          <div><span class="s-val">7,512</span><span class="s-unit">歩</span></div>
+          <div class="s-sub">Target75% ✅</div>
+        </div>
+
+        <div class="sum-card">
+          <span class="s-icon">📅</span>
+          <div class="s-label">This monthのWalkingDays</div>
+          <div><span class="s-val">22</span><span class="s-unit">Sun</span></div>
+          <div class="s-sub">28中（Achievedrate 79%）</div>
+        </div>
+
+        <div class="sum-card good">
+          <span class="s-icon">🏥</span>
+          <div class="s-label">Checkup attendance（This year）</div>
+          <div><span class="s-val">2</span><span class="s-unit">times</span></div>
+          <div class="s-sub">次times 7/12（Sat）Scheduled</div>
+        </div>
+
+        <div class="sum-card">
+          <span class="s-icon">🌟</span>
+          <div class="s-label">BalancePoints</div>
+          <div><span class="s-val">418</span><span class="s-unit">pt</span></div>
+          <div class="s-sub">Vegetable exchange To goal82pt</div>
+        </div>
+      </div>
+
+      <!-- MID GRID -->
+      <div class="mid-grid">
+
+        <!-- Left: Walking Detail -->
+        <div class="card">
+          <div class="sec-title">👟 Walkingcondition</div>
+
+          <div class="step-today-hero">
+            <div class="sth-left">
+              <div class="sth-steps">7,512</div>
+              <div class="sth-label">TodayのSteps</div>
+            </div>
+            <div class="sth-divider"></div>
+            <div class="sth-right">
+              <div class="sth-row"><span class="k">Distance</span><span class="v">5.2 km</span></div>
+              <div class="sth-row"><span class="k">Active Time</span><span class="v">1Time 22 min</span></div>
+              <div class="sth-row"><span class="k">Calories Burned</span><span class="v">248 kcal</span></div>
+              <div class="sth-bar">
+                <div class="sth-bar-fill" style="width:75%"></div>
+              </div>
+              <div style="margin-top: 8px;" class="sth-comment">✅ Today: 75% of target achieved!</div>
+            </div>
+          </div>
+
+          <!-- Weekly chart -->
+          <div class="week-label">This weekのSteps（GoalLINE 10,000 steps）</div>
+          <div class="week-chart">
+            <div class="wc-col">
+              <div class="wc-bar-wrap"><div class="wc-bar goal" style="height:64px"></div></div>
+              <div class="wc-day">Mon</div>
+            </div>
+            <div class="wc-col">
+              <div class="wc-bar-wrap"><div class="wc-bar low" style="height:26px"></div></div>
+              <div class="wc-day">Tue</div>
+            </div>
+            <div class="wc-col">
+              <div class="wc-bar-wrap"><div class="wc-bar goal" style="height:72px"></div></div>
+              <div class="wc-day">Wed</div>
+            </div>
+            <div class="wc-col">
+              <div class="wc-bar-wrap"><div class="wc-bar" style="height:56px"></div></div>
+              <div class="wc-day">Thu</div>
+            </div>
+            <div class="wc-col">
+              <div class="wc-bar-wrap"><div class="wc-bar goal" style="height:68px"></div></div>
+              <div class="wc-day">Fri</div>
+            </div>
+            <div class="wc-col">
+              <div class="wc-bar-wrap"><div class="wc-bar low" style="height:20px"></div></div>
+              <div class="wc-day">Sat</div>
+            </div>
+            <div class="wc-col">
+              <div class="wc-bar-wrap"><div class="wc-bar" style="height:60px"></div></div>
+              <div class="wc-day today-l">Today</div>
+            </div>
+          </div>
+
+          <div class="week-legend">
+            <div class="wl-item"><div class="wl-dot" style="background:var(--green-mid)"></div> Goal achieved</div>
+            <div class="wl-item"><div class="wl-dot" style="background:var(--blue-light)"></div> Achieved中</div>
+            <div class="wl-item"><div class="wl-dot" style="background:#f0b97a"></div> below target</div>
+          </div>
+
+          <!-- Activity log -->
+          <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 16px;">
+            <div class="sec-header">
+              <div class="sec-title" style="margin-bottom:0; font-size:14px;">📋 Today'sActivity</div>
+              <a href="#" class="btn-ghost" style="font-size:12px; padding:6px 12px;">全History</a>
+            </div>
+            <div class="activity-list">
+              <div class="activity-item">
+                <div class="ai-time">14:20</div>
+                <div class="ai-icon blue">👟</div>
+                <div class="ai-body">
+                  <div class="ai-title">Afternoon walking（2,100 steps）</div>
+                  <div class="ai-sub">Around the park 1.4km / 22 min</div>
+                </div>
+                <span class="ai-badge blue">+10pt</span>
+              </div>
+              <div class="activity-item">
+                <div class="ai-time">10:05</div>
+                <div class="ai-icon green">🏃</div>
+                <div class="ai-body">
+                  <div class="ai-title">Morning walk（5,412 steps）</div>
+                  <div class="ai-sub">Neighborhood route 3.8km / 60 min</div>
+                </div>
+                <span class="ai-badge green">+5pt</span>
+              </div>
+              <div class="activity-item">
+                <div class="ai-time">07:30</div>
+                <div class="ai-icon orange">⏰</div>
+                <div class="ai-body">
+                  <div class="ai-title">AppLaunch / Today'sGoalConfirm</div>
+                  <div class="ai-sub">GoalSettings：10,000 steps</div>
+                </div>
+                <span class="ai-badge orange">Launch</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Health + Checkup + Messages -->
+        <div style="display:flex; flex-direction:column; gap:20px;">
+
+          <!-- Health Status -->
+          <div class="card">
+            <div class="sec-title">❤️ Latest Health Status</div>
+            <div class="health-grid">
+              <div class="health-item ok">
+                <div class="hi-label">Weight（6/21）</div>
+                <div><span class="hi-val">64.5</span><span class="hi-unit">kg</span></div>
+                <div class="hi-sub">Within normal range ✅</div>
+              </div>
+              <div class="health-item warn">
+                <div class="hi-label">Blood Pressure（6/21）</div>
+                <div><span class="hi-val">138</span><span class="hi-unit">/88</span></div>
+                <div class="hi-sub">Slightly elevated ⚠️</div>
+              </div>
+              <div class="health-item ok">
+                <div class="hi-label">Steps 7Average</div>
+                <div><span class="hi-val">8,240</span><span class="hi-unit">歩</span></div>
+                <div class="hi-sub">Above target 👍</div>
+              </div>
+              <div class="health-item">
+                <div class="hi-label">BMI（6/21）</div>
+                <div><span class="hi-val">23.1</span></div>
+                <div class="hi-sub">Normal weight</div>
+              </div>
+            </div>
+            <div style="font-size:11px; color:var(--text-light);">※CheckupDataAttendanceonlyUpdatedwill be done</div>
+          </div>
+
+          <!-- Checkup -->
+          <div class="card">
+            <div class="sec-title">🏥 Health Checkup Status</div>
+            <div class="checkup-card">
+              <div class="cc-row">
+                <span class="cc-label">Most recent</span>
+                <span class="cc-done">✅ Attended</span>
+              </div>
+              <div class="cc-name">Blood Pressure・WeightScreening</div>
+              <div class="cc-date">📅 20266/21Sun（Sat）</div>
+            </div>
+            <div class="checkup-next">
+              <span class="cn-icon">📋</span>
+              <div class="cn-info">
+                <div class="cn-title">Next: Specific Health Checkup 2026</div>
+                <div class="cn-date">📅 7/12Sun（Sat）9:00〜 ShinguCommunity Hall<br>Please bring your points QR code</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM GRID -->
+      <div class="bot-grid">
+
+        <!-- Calendar -->
+        <div class="card">
+          <div class="sec-title">📅 6Mon WalkingCalendar</div>
+          <table class="cal-mini">
+            <tr>
+              <th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th>
+            </tr>
+            <tr>
+              <td></td><td></td><td class="walk">1</td><td class="walk">2</td><td class="walk">3</td><td class="walk">4</td><td class="miss">5</td>
+            </tr>
+            <tr>
+              <td class="miss">6</td><td class="walk">7</td><td class="walk">8</td><td class="walk">9</td><td class="walk">10</td><td class="walk">11</td><td class="miss">12</td>
+            </tr>
+            <tr>
+              <td class="walk">13</td><td class="walk">14</td><td class="walk">15</td><td class="walk">16</td><td class="walk">17</td><td class="walk">18</td><td class="walk checkup">19</td>
+            </tr>
+            <tr>
+              <td class="walk">20</td><td class="walk checkup">21</td><td class="miss">22</td><td class="walk">23</td><td class="walk">24</td><td class="walk">25</td><td class="walk">26</td>
+            </tr>
+            <tr>
+              <td class="miss">27</td><td class="today">28</td><td></td><td></td><td></td><td></td><td></td>
+            </tr>
+          </table>
+          <div class="week-legend" style="margin-top:12px; flex-wrap:wrap; gap:8px;">
+            <div class="wl-item"><div class="wl-dot" style="background:var(--green-pale); border:1px solid var(--green-light)"></div> WalkingYes</div>
+            <div class="wl-item"><div class="wl-dot" style="background:#fff3ea; border:1px solid #f0b97a"></div> below target/None</div>
+            <div class="wl-item"><span style="font-size:10px;">🏥</span> Checkup attendance</div>
+          </div>
+        </div>
+
+        <!-- Points -->
+        <div class="card">
+          <div class="sec-title">🌟 Points Status</div>
+          <div class="point-total">
+            <div>
+              <div class="pt-total-label">Current balancePoints</div>
+              <div><span class="pt-total-val">418</span><span class="pt-total-unit">pt</span></div>
+            </div>
+            <span class="pt-coin">🌟</span>
+          </div>
+          <div class="pt-row">
+            <span class="pt-ico">🏃</span>
+            <span class="pt-desc">Walking achieved（7,500 steps）</span>
+            <span class="pt-pts">+15pt</span>
+            <span class="pt-date">Today</span>
+          </div>
+          <div class="pt-row">
+            <span class="pt-ico">🏥</span>
+            <span class="pt-desc">Checkup attendanceBonus</span>
+            <span class="pt-pts">+50pt</span>
+            <span class="pt-date">6/21</span>
+          </div>
+          <div class="pt-row">
+            <span class="pt-ico">🏆</span>
+            <span class="pt-desc">weeksGoal achieved</span>
+            <span class="pt-pts">+20pt</span>
+            <span class="pt-date">6/20</span>
+          </div>
+          <div style="margin-top:10px; font-size:12px; color:var(--text-light); background:var(--earth-light); border-radius:9px; padding:10px 12px;">
+            <strong style="color:var(--earth)">NextExchange until Only 82pt</strong><br>
+            7/12のCheckupでPointsUsage &Vegetable exchangeis possible.
+          </div>
+        </div>
+
+        <!-- Messages -->
+        <div class="card">
+          <div class="sec-header">
+            <div class="sec-title" style="margin-bottom:0;">💬 Messages</div>
+            <span style="font-size:11px; background:var(--orange); color:#fff; padding:2px 8px; border-radius:20px; font-weight:700;">New 2items</span>
+          </div>
+          <div class="msg-list">
+            <div class="msg-item admin">
+              <div class="msg-header">
+                <span class="msg-from">🏛 Shingu City Health Promotion Dept.</span>
+                <span class="msg-date">Today</span>
+              </div>
+              <div class="msg-body">7/12のSpecific Health CheckupNotification of.。Tanaka.のPointsQRPlease present your code at the venue on the day。</div>
+            </div>
+            <div class="msg-item new">
+              <div class="msg-header">
+                <span class="msg-from">🥦 Vege Ta Walk</span>
+                <span class="msg-date">Yesterday</span>
+              </div>
+              <div class="msg-body">Yesterdayはstep count was low（3,200 steps）。TodayもWalksteps is recommended 🌿</div>
+            </div>
+          </div>
+
+          <!-- Send message -->
+          <div class="sec-title" style="font-size:13px; margin-top:14px; margin-bottom:8px;">✍️ おDad.にMessages</div>
+          <div class="send-box">
+            <textarea placeholder="MessagesEnter…"></textarea>
+            <div class="send-box-footer">
+              <span>In-appNotificationwill be delivered as</span>
+              <a href="#" class="btn-primary" style="padding:6px 14px; font-size:12px;">📤 Send</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      </div><!-- /page-dashboard -->
+
+      <!-- ====== PAGE: STEPS ====== -->
+      <div class="page" id="page-steps">
+        <div class="card" style="margin-bottom:20px;">
+          <div class="sec-header" style="margin-bottom:16px;">
+            <div class="sec-title" style="margin-bottom:0;">👟 Detailed Walking Records</div>
+            <div class="filter-tabs" style="margin-bottom:0;">
+              <div class="filter-tab active">Today</div>
+              <div class="filter-tab">This week</div>
+              <div class="filter-tab">This month</div>
+            </div>
+          </div>
+
+          <!-- Stats summary -->
+          <div class="summary-grid" style="margin-bottom:20px;">
+            <div class="sum-card">
+              <span class="s-icon">📊</span>
+              <div class="s-label">This monthTotal</div>
+              <div><span class="s-val">182,340</span><span class="s-unit">歩</span></div>
+              <div class="s-sub">6/1Sun〜28Sun</div>
+            </div>
+            <div class="sum-card good">
+              <span class="s-icon">📈</span>
+              <div class="s-label">Daily average</div>
+              <div><span class="s-val">6,078</span><span class="s-unit">歩</span></div>
+              <div class="s-sub">Target60.8%</div>
+            </div>
+            <div class="sum-card good">
+              <span class="s-icon">🏆</span>
+              <div class="s-label">Best record</div>
+              <div><span class="s-val">9,870</span><span class="s-unit">歩</span></div>
+              <div class="s-sub">6/21Sun（Checkup day）</div>
+            </div>
+            <div class="sum-card warn">
+              <span class="s-icon">⚠️</span>
+              <div class="s-label">MinimumRecords</div>
+              <div><span class="s-val">1,200</span><span class="s-unit">歩</span></div>
+              <div class="s-sub">6/12Sun（Rainy day）</div>
+            </div>
+          </div>
+
+          <!-- Weekly comparison chart -->
+          <div class="sec-title" style="font-size:14px; margin-bottom:12px;">📊 By weekAverageStepsComparison</div>
+          <div style="display:flex; gap:32px; align-items:flex-end; height:130px; padding:0 16px; margin-bottom:8px;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;">
+              <div style="font-size:11px;color:var(--text-light);font-weight:600;">6,840 steps</div>
+              <div style="width:60px;height:95px;background:var(--blue-light);border-radius:6px 6px 0 0;"></div>
+              <div style="font-size:12px;color:var(--text-mid);font-weight:700;">2 weeks ago</div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;">
+              <div style="font-size:11px;color:var(--text-light);font-weight:600;">7,120 steps</div>
+              <div style="width:60px;height:105px;background:var(--blue-mid);border-radius:6px 6px 0 0;"></div>
+              <div style="font-size:12px;color:var(--text-mid);font-weight:700;">Last week</div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;">
+              <div style="font-size:11px;color:var(--green-dark);font-weight:700;">7,512 steps ▲</div>
+              <div style="width:60px;height:112px;background:var(--green-mid);border-radius:6px 6px 0 0;"></div>
+              <div style="font-size:12px;color:var(--blue-dark);font-weight:800;">This week</div>
+            </div>
+          </div>
+          <div style="font-size:11px;color:var(--text-light);text-align:center;margin-bottom:20px;">Last week比 +5.5% Increasing 📈</div>
+
+          <!-- Activity pattern by time of day -->
+          <div class="sec-title" style="font-size:14px; margin-bottom:12px;">⏰ TimeActivity pattern by time slot（This monthAverage）</div>
+          <div class="time-pattern" style="margin-bottom:20px;">
+            <div class="tp-item">
+              <div class="tp-time">Morning (6〜9:00)</div>
+              <div class="tp-icon">🌅</div>
+              <div class="tp-level mid">Moderate</div>
+              <div style="font-size:11px;color:var(--text-light);margin-top:4px;">Average 2,800 steps</div>
+            </div>
+            <div class="tp-item">
+              <div class="tp-time">Morning (9〜12:00)</div>
+              <div class="tp-icon">☀️</div>
+              <div class="tp-level high">High</div>
+              <div style="font-size:11px;color:var(--text-light);margin-top:4px;">Average 3,100 steps</div>
+            </div>
+            <div class="tp-item">
+              <div class="tp-time">Midday (12〜15:00)</div>
+              <div class="tp-icon">🌤️</div>
+              <div class="tp-level low">Low</div>
+              <div style="font-size:11px;color:var(--text-light);margin-top:4px;">Average 620 steps</div>
+            </div>
+            <div class="tp-item">
+              <div class="tp-time">Evening (16〜19:00)</div>
+              <div class="tp-icon">🌆</div>
+              <div class="tp-level high">High</div>
+              <div style="font-size:11px;color:var(--text-light);margin-top:4px;">Average 1,800 steps</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detailed daily log -->
+        <div class="card">
+          <div class="sec-title">📋 Past14betweenWalkingRecords</div>
+          <div style="overflow-x:auto;">
+            <table class="steps-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Steps</th>
+                  <th>Distance</th>
+                  <th>WalkingTime</th>
+                  <th>Intensity</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>6/28（Sun）</td>
+                  <td class="steps-val">8,432 steps</td>
+                  <td>5.9 km</td>
+                  <td>82 min</td>
+                  <td class="intensity-mid">Moderate</td>
+                  <td>Morning walkvia park</td>
+                </tr>
+                <tr>
+                  <td>6/27（Sat）</td>
+                  <td class="steps-val">3,200 steps</td>
+                  <td>2.2 km</td>
+                  <td>31 min</td>
+                  <td class="intensity-low">Low</td>
+                  <td>Rainy dayneighborhood only</td>
+                </tr>
+                <tr>
+                  <td>6/26（Fri）</td>
+                  <td class="steps-val">7,890 steps</td>
+                  <td>5.5 km</td>
+                  <td>76 min</td>
+                  <td class="intensity-mid">Moderate</td>
+                  <td>CheckupPost- walk</td>
+                </tr>
+                <tr>
+                  <td>6/25（Thu）</td>
+                  <td class="steps-val">8,100 steps</td>
+                  <td>5.7 km</td>
+                  <td>78 min</td>
+                  <td class="intensity-mid">Moderate</td>
+                  <td>Neighborhood round trip</td>
+                </tr>
+                <tr>
+                  <td>6/24（Wed）</td>
+                  <td class="steps-val">9,210 steps</td>
+                  <td>6.4 km</td>
+                  <td>89 min</td>
+                  <td class="intensity-high">High</td>
+                  <td>Park stroll with friend</td>
+                </tr>
+                <tr>
+                  <td>6/23（Tue）</td>
+                  <td class="steps-val">6,540 steps</td>
+                  <td>4.6 km</td>
+                  <td>63 min</td>
+                  <td class="intensity-mid">Moderate</td>
+                  <td>Usual route</td>
+                </tr>
+                <tr>
+                  <td>6/22（Mon）</td>
+                  <td class="steps-val">4,320 steps</td>
+                  <td>3.0 km</td>
+                  <td>42 min</td>
+                  <td class="intensity-low">Low</td>
+                  <td>Feeling slightly unwell</td>
+                </tr>
+                <tr>
+                  <td>6/21（Sun）</td>
+                  <td class="steps-val">9,870 steps</td>
+                  <td>6.9 km</td>
+                  <td>95 min</td>
+                  <td class="intensity-high">High</td>
+                  <td>Checkup attendance 🏥</td>
+                </tr>
+                <tr>
+                  <td>6/20（Sat）</td>
+                  <td class="steps-val">8,760 steps</td>
+                  <td>6.1 km</td>
+                  <td>84 min</td>
+                  <td class="intensity-mid">Moderate</td>
+                  <td>Weekend walk</td>
+                </tr>
+                <tr>
+                  <td>6/19（Fri）</td>
+                  <td class="steps-val">7,230 steps</td>
+                  <td>5.0 km</td>
+                  <td>70 min</td>
+                  <td class="intensity-mid">Moderate</td>
+                  <td>Usual route</td>
+                </tr>
+                <tr>
+                  <td>6/18（Thu）</td>
+                  <td class="steps-val">6,980 steps</td>
+                  <td>4.9 km</td>
+                  <td>67 min</td>
+                  <td class="intensity-mid">Moderate</td>
+                  <td>Mainly evening</td>
+                </tr>
+                <tr>
+                  <td>6/17（Wed）</td>
+                  <td class="steps-val">8,450 steps</td>
+                  <td>5.9 km</td>
+                  <td>81 min</td>
+                  <td class="intensity-high">High</td>
+                  <td>Sunny & ShinguDistance</td>
+                </tr>
+                <tr>
+                  <td>6/16（Tue）</td>
+                  <td class="steps-val">5,120 steps</td>
+                  <td>3.6 km</td>
+                  <td>49 min</td>
+                  <td class="intensity-low">Low</td>
+                  <td>Afternoon outing only</td>
+                </tr>
+                <tr>
+                  <td>6/15（Mon）</td>
+                  <td class="steps-val">7,680 steps</td>
+                  <td>5.4 km</td>
+                  <td>74 min</td>
+                  <td class="intensity-mid">Moderate</td>
+                  <td>Morning & Evening2times</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div><!-- /page-steps -->
+
+      <!-- ====== PAGE: CALENDAR ====== -->
+      <div class="page" id="page-calendar">
+        <div class="card">
+          <!-- Month header -->
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+            <button class="btn-ghost" style="padding:8px 16px;">&lt; 前Mon</button>
+            <div style="font-size:22px;font-weight:800;color:var(--blue-dark);">20266Mon</div>
+            <button class="btn-ghost" style="padding:8px 16px;">次Mon &gt;</button>
+          </div>
+
+          <!-- Monthly stats -->
+          <div class="summary-grid" style="margin-bottom:20px;">
+            <div class="sum-card good">
+              <span class="s-icon">🏆</span>
+              <div class="s-label">10,000 stepsor moreAchieved</div>
+              <div><span class="s-val">8</span><span class="s-unit">Sun</span></div>
+              <div class="s-sub">This monthのDays achieved</div>
+            </div>
+            <div class="sum-card">
+              <span class="s-icon">📊</span>
+              <div class="s-label">MonthlyAverageSteps</div>
+              <div><span class="s-val">6,078</span><span class="s-unit">歩</span></div>
+              <div class="s-sub">This month（6/1〜28）</div>
+            </div>
+            <div class="sum-card good">
+              <span class="s-icon">🏥</span>
+              <div class="s-label">Checkup attendance</div>
+              <div><span class="s-val">1</span><span class="s-unit">times</span></div>
+              <div class="s-sub">6/26 ShinguCommunity Hall</div>
+            </div>
+            <div class="sum-card warn">
+              <span class="s-icon">☔</span>
+              <div class="s-label">WalkingNoneSun</div>
+              <div><span class="s-val">4</span><span class="s-unit">Sun</span></div>
+              <div class="s-sub">withinRainy day3Sun</div>
+            </div>
+          </div>
+
+          <!-- Calendar grid -->
+          <div style="overflow-x:auto;">
+            <table class="cal-full">
+              <thead>
+                <tr>
+                  <th style="color:#c0392b;">Sun</th>
+                  <th>Mon</th>
+                  <th>Tue</th>
+                  <th>Wed</th>
+                  <th>Thu</th>
+                  <th>Fri</th>
+                  <th style="color:#2563b0;">Sat</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="cal-empty"></td>
+                  <td class="cal-green-mid"><span class="cal-day-num">1</span><span class="cal-steps">7,340 steps</span></td>
+                  <td class="cal-green-mid"><span class="cal-day-num">2</span><span class="cal-steps">8,120 steps</span></td>
+                  <td class="cal-green-dark"><span class="cal-day-num">3</span><span class="cal-steps">10,450 steps</span></td>
+                  <td class="cal-amber"><span class="cal-day-num">4</span><span class="cal-steps">5,230 steps</span></td>
+                  <td class="cal-green-dark"><span class="cal-day-num">5</span><span class="cal-steps">11,200 steps</span></td>
+                  <td class="cal-pale"><span class="cal-day-num">6</span><span class="cal-steps">2,100 steps</span></td>
+                </tr>
+                <tr>
+                  <td class="cal-pale"><span class="cal-day-num">7</span><span class="cal-steps">1,800 steps</span></td>
+                  <td class="cal-green-dark"><span class="cal-day-num">8</span><span class="cal-steps">10,890 steps</span></td>
+                  <td class="cal-green-mid"><span class="cal-day-num">9</span><span class="cal-steps">8,760 steps</span></td>
+                  <td class="cal-green-mid"><span class="cal-day-num">10</span><span class="cal-steps">7,540 steps</span></td>
+                  <td class="cal-green-mid"><span class="cal-day-num">11</span><span class="cal-steps">8,230 steps</span></td>
+                  <td class="cal-green-dark"><span class="cal-day-num">12</span><span class="cal-steps">10,120 steps</span></td>
+                  <td class="cal-pale"><span class="cal-day-num">13</span><span class="cal-steps">1,200 steps</span></td>
+                </tr>
+                <tr>
+                  <td class="cal-green-mid"><span class="cal-day-num">14</span><span class="cal-steps">7,890 steps</span></td>
+                  <td class="cal-amber"><span class="cal-day-num">15</span><span class="cal-steps">5,680 steps</span></td>
+                  <td class="cal-green-mid"><span class="cal-day-num">16</span><span class="cal-steps">7,120 steps</span></td>
+                  <td class="cal-green-mid"><span class="cal-day-num">17</span><span class="cal-steps">8,450 steps</span></td>
+                  <td class="cal-amber"><span class="cal-day-num">18</span><span class="cal-steps">6,980 steps</span></td>
+                  <td class="cal-green-mid"><span class="cal-day-num">19</span><span class="cal-steps">7,230 steps</span></td>
+                  <td class="cal-green-dark"><span class="cal-day-num">20</span><span class="cal-steps">10,760 steps</span></td>
+                </tr>
+                <tr>
+                  <td class="cal-green-dark cal-special" data-special="🏥Checkup"><span class="cal-day-num">21</span><span class="cal-steps">9,870 steps</span></td>
+                  <td class="cal-pale"><span class="cal-day-num">22</span><span class="cal-steps">3,100 steps</span></td>
+                  <td class="cal-amber"><span class="cal-day-num">23</span><span class="cal-steps">6,540 steps</span></td>
+                  <td class="cal-green-mid"><span class="cal-day-num">24</span><span class="cal-steps">9,210 steps</span></td>
+                  <td class="cal-green-mid"><span class="cal-day-num">25</span><span class="cal-steps">8,100 steps</span></td>
+                  <td class="cal-green-dark cal-special" data-special="🏥Checkup"><span class="cal-day-num">26</span><span class="cal-steps">7,890 steps</span></td>
+                  <td class="cal-pale"><span class="cal-day-num">27</span><span class="cal-steps">3,200 steps</span></td>
+                </tr>
+                <tr>
+                  <td class="cal-green-mid cal-today"><span class="cal-day-num">28</span><span class="cal-steps">8,432 steps</span></td>
+                  <td class="cal-future"><span class="cal-day-num">29</span></td>
+                  <td class="cal-future"><span class="cal-day-num">30</span></td>
+                  <td class="cal-empty"></td>
+                  <td class="cal-empty"></td>
+                  <td class="cal-empty"></td>
+                  <td class="cal-empty"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Legend -->
+          <div class="cal-legend">
+            <div class="cl-item"><div class="cl-dot" style="background:#2d6b3a;"></div> 10,000 stepsor more</div>
+            <div class="cl-item"><div class="cl-dot" style="background:#c8eacc; border:1px solid #4a9e58;"></div> 7,000〜9,999 steps</div>
+            <div class="cl-item"><div class="cl-dot" style="background:#fff3cd; border:1px solid #f0b97a;"></div> 4,000〜6,999 steps</div>
+            <div class="cl-item"><div class="cl-dot" style="background:#fff8f0; border:1px solid #f0b97a;"></div> 4,000 stepsunder</div>
+            <div class="cl-item"><div class="cl-dot" style="background:#f0f0f0; border:1px solid #ccc;"></div> FutureSun</div>
+            <div class="cl-item"><span style="font-size:13px;">🏥</span> Checkup attendanceSun</div>
+            <div class="cl-item"><div style="width:14px;height:14px;border-radius:3px;border:3px solid var(--blue-mid);"></div> Today</div>
+          </div>
+
+          <div style="margin-top:14px; padding:12px 16px; background:#edf4fc; border-radius:10px; font-size:12px; color:var(--text-mid);">
+            💡 Click each day on the calendar to see、Detailed activity for that dayRecordsをConfirmavailable。
+          </div>
+        </div>
+      </div><!-- /page-calendar -->
+
+      <!-- ====== PAGE: CHECKUP ====== -->
+      <div class="page" id="page-checkup">
+
+        <!-- Next checkup hero -->
+        <div class="next-checkup-card">
+          <div class="nc-icon">📋</div>
+          <div class="nc-info">
+            <div class="nc-label">NextCheckup</div>
+            <div class="nc-title">Specific Health Checkup 2026度 No.4times</div>
+            <div class="nc-details">
+              📅 20267/12Sun（Sat）10:00〜12:00<br>
+              📍 ShinguCommunity Hall 3F HealthConsultation Room<br>
+              💡 PointsQRBring your codePlease
+            </div>
+          </div>
+          <div class="nc-badge">✅ Reserved</div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:2fr 1fr; gap:20px; margin-bottom:20px;">
+
+          <!-- Participation history -->
+          <div class="card">
+            <div class="sec-title">📊 This fiscal yearAttendanceHistory</div>
+            <table class="checkup-hist-table">
+              <thead>
+                <tr>
+                  <th>times</th>
+                  <th>Date</th>
+                  <th>Location</th>
+                  <th>Types</th>
+                  <th>Attendance</th>
+                  <th>EarnedPoints</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>No.1times</strong></td>
+                  <td>4/10（Thu）</td>
+                  <td>ShinguCommunity Hall</td>
+                  <td>Blood Pressure・WeightMeasurement</td>
+                  <td><span style="color:var(--green-dark);font-weight:700;">✅ Attendance</span></td>
+                  <td><strong style="color:var(--blue-dark);">+50pt</strong></td>
+                </tr>
+                <tr>
+                  <td><strong>No.2times</strong></td>
+                  <td>5/22（Thu）</td>
+                  <td>CentralPublic Hall</td>
+                  <td>Bone density test</td>
+                  <td><span style="color:var(--green-dark);font-weight:700;">✅ Attendance</span></td>
+                  <td><strong style="color:var(--blue-dark);">+50pt</strong></td>
+                </tr>
+                <tr>
+                  <td><strong>No.3times</strong></td>
+                  <td>6/26（Fri）</td>
+                  <td>ShinguCommunity Hall</td>
+                  <td>Specific Health Checkup</td>
+                  <td><span style="color:var(--green-dark);font-weight:700;">✅ Attendance</span></td>
+                  <td><strong style="color:var(--blue-dark);">+50pt</strong></td>
+                </tr>
+                <tr style="background:var(--blue-pale);">
+                  <td><strong>No.4times</strong></td>
+                  <td>7/12（Sat）</td>
+                  <td>ShinguCommunity Hall</td>
+                  <td>Specific Health Checkup（Full version）</td>
+                  <td><span style="color:var(--text-light);">📅 Scheduled</span></td>
+                  <td style="color:var(--text-light);">—</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Alert countdown -->
+          <div style="display:flex;flex-direction:column;gap:16px;">
+            <div class="card" style="text-align:center;">
+              <div style="font-size:14px;font-weight:700;color:var(--blue-dark);margin-bottom:8px;">🏥 Next Checkup until</div>
+              <div style="font-size:52px;font-weight:800;color:var(--orange);line-height:1;">14</div>
+              <div style="font-size:14px;color:var(--text-light);margin-bottom:14px;">Sun</div>
+              <div style="font-size:12px;color:var(--text-mid);background:var(--orange-pale);border:1px solid #f0b97a;border-radius:8px;padding:10px;">
+                7/12Sun（Sat）the day beforeReminderNotificationwill be delivered
+              </div>
+              <button class="btn-primary" style="margin-top:12px;width:100%;">🔔 ReminderSettings</button>
+            </div>
+            <div class="card">
+              <div class="sec-title" style="font-size:13px;margin-bottom:10px;">📈 Attendancerate</div>
+              <div style="font-size:36px;font-weight:800;color:var(--green-dark);text-align:center;line-height:1;">100%</div>
+              <div style="font-size:12px;color:var(--text-light);text-align:center;margin:4px 0 12px;">3回Attendance / 3sessions held</div>
+              <div style="height:8px;background:#e0ecf8;border-radius:99px;overflow:hidden;">
+                <div style="width:75%;height:100%;background:var(--green-mid);border-radius:99px;"></div>
+              </div>
+              <div style="font-size:11px;color:var(--text-light);margin-top:6px;">AnnualGoal 4out of 3回Completed</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Health results summary -->
+        <div class="card" style="margin-bottom:20px;">
+          <div class="sec-title">❤️ Recent2ofCheckupResult comparison</div>
+          <div style="overflow-x:auto;">
+            <table class="checkup-hist-table">
+              <thead>
+                <tr>
+                  <th>MeasurementItem</th>
+                  <th>No.2times (5/22)</th>
+                  <th>No.3times (6/26)</th>
+                  <th>Change</th>
+                  <th>Assessment</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Weight</td>
+                  <td>65.2 kg</td>
+                  <td>64.5 kg</td>
+                  <td style="color:var(--green-dark);font-weight:700;">▼ 0.7 kg</td>
+                  <td><span style="color:var(--green-dark);">✅ Improvement</span></td>
+                </tr>
+                <tr>
+                  <td>SystolicBlood Pressure</td>
+                  <td>142 mmHg</td>
+                  <td>138 mmHg</td>
+                  <td style="color:var(--green-dark);font-weight:700;">▼ 4 mmHg</td>
+                  <td><span style="color:var(--orange);">⚠️ Caution</span></td>
+                </tr>
+                <tr>
+                  <td>DiastolicBlood Pressure</td>
+                  <td>92 mmHg</td>
+                  <td>88 mmHg</td>
+                  <td style="color:var(--green-dark);font-weight:700;">▼ 4 mmHg</td>
+                  <td><span style="color:var(--orange);">⚠️ Caution</span></td>
+                </tr>
+                <tr>
+                  <td>BMI</td>
+                  <td>23.4</td>
+                  <td>23.1</td>
+                  <td style="color:var(--green-dark);font-weight:700;">▼ 0.3</td>
+                  <td><span style="color:var(--green-dark);">✅ Normal weight</span></td>
+                </tr>
+                <tr>
+                  <td>Bone density</td>
+                  <td>78%</td>
+                  <td>—</td>
+                  <td>—</td>
+                  <td><span style="color:var(--orange);">⚠️ SlightlyLow</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="margin-top:10px;padding:10px 14px;background:var(--blue-pale);border-radius:9px;font-size:12px;color:var(--text-mid);">
+            📌 Blood Pressureis gradually々is showing improvement, but、Continued monitoring needed.。WalkingContinuationBlood Pressureis considered to be contributing to improvement。
+          </div>
+        </div>
+
+        <!-- Reminder timeline -->
+        <div class="card">
+          <div class="sec-title">👨‍👩‍👧 Family remindersRecords</div>
+          <div class="reminder-timeline">
+            <div class="rt-item">
+              <div class="rt-date">6/25 20:00</div>
+              <div class="rt-from">Yoko Tanaka（Daughter）</div>
+              <div class="rt-msg">「おDad.、Tomorrow'sCheckupPlease remember。QRGot my code？」</div>
+            </div>
+            <div class="rt-item">
+              <div class="rt-date">6/25 20:30</div>
+              <div class="rt-from">Masao Tanaka（Dad）</div>
+              <div class="rt-msg">「Got it、I'm already getting ready。Thank you」</div>
+            </div>
+            <div class="rt-item">
+              <div class="rt-date">6/26 13:00</div>
+              <div class="rt-from">System notification</div>
+              <div class="rt-msg">✅ Masao Tanaka.がCheckupにAttendance.。+50PointsEarned</div>
+            </div>
+            <div class="rt-item">
+              <div class="rt-date">5/21 19:00</div>
+              <div class="rt-from">Yoko Tanaka（Daughter）</div>
+              <div class="rt-msg">「TomorrowBone densitytest。Make sure to stay hydrated」</div>
+            </div>
+            <div class="rt-item">
+              <div class="rt-date">4/10 12:30</div>
+              <div class="rt-from">System notification</div>
+              <div class="rt-msg">✅ Masao Tanaka.がNo.1回CheckupにAttendance.。+50PointsEarned</div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /page-checkup -->
+
+      <!-- ====== PAGE: POINTS ====== -->
+      <div class="page" id="page-points">
+
+        <!-- Hero -->
+        <div class="points-hero">
+          <div class="ph-main">
+            <div class="ph-label">Current balancePoints</div>
+            <div><span class="ph-value">247</span><span class="ph-unit">pt</span></div>
+          </div>
+          <div class="ph-coin">🌟</div>
+          <div class="ph-progress">
+            <div class="ph-prog-label">Only <strong>53pt</strong> でVegetablesExchangepossible！</div>
+            <div class="ph-prog-bar">
+              <div class="ph-prog-fill" style="width:82%;"></div>
+            </div>
+            <div class="ph-prog-sub">247 / 300pt（To goal53pt）</div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
+          <!-- Earning breakdown -->
+          <div class="card">
+            <div class="sec-title">📊 By monthPointsEarnedBreakdown</div>
+            <div style="display:flex;gap:8px;margin-bottom:10px;font-size:11px;color:var(--text-light);">
+              <div style="display:flex;align-items:center;gap:4px;"><div style="width:12px;height:12px;border-radius:3px;background:var(--blue-light);"></div> WalkingPoints</div>
+              <div style="display:flex;align-items:center;gap:4px;"><div style="width:12px;height:12px;border-radius:3px;background:var(--green-mid);"></div> CheckupPoints</div>
+            </div>
+            <div style="display:flex;gap:20px;align-items:flex-end;height:140px;padding-bottom:8px;">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">
+                <div style="display:flex;gap:3px;align-items:flex-end;height:110px;">
+                  <div style="width:22px;height:60px;background:var(--blue-light);border-radius:4px 4px 0 0;"></div>
+                  <div style="width:22px;height:50px;background:var(--green-mid);border-radius:4px 4px 0 0;"></div>
+                </div>
+                <div style="font-size:10px;color:var(--text-light);">4Mon</div>
+                <div style="font-size:11px;font-weight:700;color:var(--text-mid);">110pt</div>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">
+                <div style="display:flex;gap:3px;align-items:flex-end;height:110px;">
+                  <div style="width:22px;height:75px;background:var(--blue-light);border-radius:4px 4px 0 0;"></div>
+                  <div style="width:22px;height:50px;background:var(--green-mid);border-radius:4px 4px 0 0;"></div>
+                </div>
+                <div style="font-size:10px;color:var(--text-light);">5Mon</div>
+                <div style="font-size:11px;font-weight:700;color:var(--text-mid);">125pt</div>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">
+                <div style="display:flex;gap:3px;align-items:flex-end;height:110px;">
+                  <div style="width:22px;height:85px;background:var(--blue-mid);border-radius:4px 4px 0 0;"></div>
+                  <div style="width:22px;height:50px;background:var(--green-dark);border-radius:4px 4px 0 0;"></div>
+                </div>
+                <div style="font-size:10px;color:var(--blue-dark);font-weight:700;">6Mon</div>
+                <div style="font-size:11px;font-weight:800;color:var(--blue-dark);">135pt</div>
+              </div>
+            </div>
+            <div style="padding:12px;background:var(--green-pale);border-radius:10px;font-size:12px;color:var(--green-dark);">
+              📈 At this pace,This monthat end of <strong>+180pt</strong> EarnedProjected（Until end of monthOnly3Sun）
+            </div>
+          </div>
+
+          <!-- Exchange history -->
+          <div class="card">
+            <div class="sec-title">🥦 ExchangeHistory</div>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
+              <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:#edf7ef;border:1px solid var(--green-light);border-radius:10px;">
+                <div style="font-size:28px;">🍆</div>
+                <div style="flex:1;">
+                  <div style="font-size:13px;font-weight:700;color:var(--green-dark);">Eggplant 3bottle</div>
+                  <div style="font-size:11px;color:var(--text-light);">20266/15Sun Exchange</div>
+                </div>
+                <div style="font-size:14px;font-weight:800;color:var(--red);">-100pt</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:#edf7ef;border:1px solid var(--green-light);border-radius:10px;">
+                <div style="font-size:28px;">🥒</div>
+                <div style="flex:1;">
+                  <div style="font-size:13px;font-weight:700;color:var(--green-dark);">Cucumber 2bottle</div>
+                  <div style="font-size:11px;color:var(--text-light);">20265/20Sun Exchange</div>
+                </div>
+                <div style="font-size:14px;font-weight:800;color:var(--red);">-100pt</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:#edf7ef;border:1px solid var(--green-light);border-radius:10px;">
+                <div style="font-size:28px;">🍅</div>
+                <div style="flex:1;">
+                  <div style="font-size:13px;font-weight:700;color:var(--green-dark);">Cherry tomatoes 1Pack</div>
+                  <div style="font-size:11px;color:var(--text-light);">20264/28Sun Exchange</div>
+                </div>
+                <div style="font-size:14px;font-weight:800;color:var(--red);">-100pt</div>
+              </div>
+            </div>
+            <div style="padding:12px;background:var(--earth-light);border-radius:10px;font-size:12px;color:var(--earth);">
+              🥦 NextExchangeは <strong>7/12のCheckupVenue</strong> possible via.
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent point history -->
+        <div class="card">
+          <div class="sec-title">📋 RecentPointsHistory</div>
+          <table class="points-hist-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Activity</th>
+                <th>Category</th>
+                <th>Points</th>
+                <th>Balance</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>6/28</td>
+                <td>Walking achieved（8,432 steps）</td>
+                <td><span style="font-size:11px;background:var(--blue-pale);color:var(--blue-mid);padding:2px 8px;border-radius:20px;font-weight:700;">Walking</span></td>
+                <td class="gain">+15pt</td>
+                <td>247pt</td>
+              </tr>
+              <tr>
+                <td>6/27</td>
+                <td>Walking（3,200 steps）</td>
+                <td><span style="font-size:11px;background:var(--blue-pale);color:var(--blue-mid);padding:2px 8px;border-radius:20px;font-weight:700;">Walking</span></td>
+                <td class="gain">+8pt</td>
+                <td>232pt</td>
+              </tr>
+              <tr>
+                <td>6/26</td>
+                <td>Checkup attendanceBonus（Specific Health Checkup）</td>
+                <td><span style="font-size:11px;background:var(--green-pale);color:var(--green-dark);padding:2px 8px;border-radius:20px;font-weight:700;">Checkup</span></td>
+                <td class="gain">+50pt</td>
+                <td>224pt</td>
+              </tr>
+              <tr>
+                <td>6/26</td>
+                <td>Walking achieved（7,890 steps）</td>
+                <td><span style="font-size:11px;background:var(--blue-pale);color:var(--blue-mid);padding:2px 8px;border-radius:20px;font-weight:700;">Walking</span></td>
+                <td class="gain">+15pt</td>
+                <td>174pt</td>
+              </tr>
+              <tr>
+                <td>6/25</td>
+                <td>Walking achieved（8,100 steps）</td>
+                <td><span style="font-size:11px;background:var(--blue-pale);color:var(--blue-mid);padding:2px 8px;border-radius:20px;font-weight:700;">Walking</span></td>
+                <td class="gain">+15pt</td>
+                <td>159pt</td>
+              </tr>
+              <tr>
+                <td>6/24</td>
+                <td>Walking achieved（9,210 steps）</td>
+                <td><span style="font-size:11px;background:var(--blue-pale);color:var(--blue-mid);padding:2px 8px;border-radius:20px;font-weight:700;">Walking</span></td>
+                <td class="gain">+15pt</td>
+                <td>144pt</td>
+              </tr>
+              <tr>
+                <td>6/15</td>
+                <td>Eggplant3andExchange</td>
+                <td><span style="font-size:11px;background:#fff0f0;color:var(--red);padding:2px 8px;border-radius:20px;font-weight:700;">Exchange</span></td>
+                <td class="lose">-100pt</td>
+                <td>129pt</td>
+              </tr>
+              <tr>
+                <td>6/10</td>
+                <td>weeksGoal achievedBonus</td>
+                <td><span style="font-size:11px;background:var(--earth-light);color:var(--earth);padding:2px 8px;border-radius:20px;font-weight:700;">Bonus</span></td>
+                <td class="gain">+20pt</td>
+                <td>229pt</td>
+              </tr>
+              <tr>
+                <td>5/22</td>
+                <td>Checkup attendanceBonus（Bone density test）</td>
+                <td><span style="font-size:11px;background:var(--green-pale);color:var(--green-dark);padding:2px 8px;border-radius:20px;font-weight:700;">Checkup</span></td>
+                <td class="gain">+50pt</td>
+                <td>209pt</td>
+              </tr>
+              <tr>
+                <td>5/20</td>
+                <td>cucumber andExchange</td>
+                <td><span style="font-size:11px;background:#fff0f0;color:var(--red);padding:2px 8px;border-radius:20px;font-weight:700;">Exchange</span></td>
+                <td class="lose">-100pt</td>
+                <td>159pt</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div><!-- /page-points -->
+
+      <!-- ====== PAGE: MESSAGES ====== -->
+      <div class="page" id="page-messages">
+        <div class="card">
+          <div class="sec-header" style="margin-bottom:16px;">
+            <div class="sec-title" style="margin-bottom:0;">💬 Messages with Masao Tanaka</div>
+            <span style="font-size:11px;background:var(--orange);color:#fff;padding:3px 10px;border-radius:20px;font-weight:700;">Unread 2items</span>
+          </div>
+
+          <!-- Chat container -->
+          <div class="chat-container">
+
+            <!-- System notification -->
+            <div class="chat-bubble system">
+              <div class="cb-text">
+                🔔 System notification — 6/26 13:05<br>Masao Tanaka.がCheckup（Specific Health Checkup）にAttendance.。+50PointsEarned！
+              </div>
+            </div>
+
+            <!-- Family message -->
+            <div class="chat-bubble family">
+              <div class="cb-avatar">👩</div>
+              <div class="cb-content">
+                <div class="cb-name">Yoko Tanaka（Daughter）</div>
+                <div class="cb-text">おDad.、CheckupGood work！How were the results?？</div>
+                <div class="cb-time">6/26 20:00</div>
+              </div>
+            </div>
+
+            <!-- Parent reply -->
+            <div class="chat-bubble parent">
+              <div class="cb-avatar">👴</div>
+              <div class="cb-content">
+                <div class="cb-name">Masao Tanaka（Dad）</div>
+                <div class="cb-text">The doctor saidBlood PressureThe doctor said it went down a bit。Seems like the walks are paying off 😊</div>
+                <div class="cb-time">6/26 20:10</div>
+              </div>
+            </div>
+
+            <!-- Family -->
+            <div class="chat-bubble family">
+              <div class="cb-avatar">👩</div>
+              <div class="cb-content">
+                <div class="cb-name">Yoko Tanaka（Daughter）</div>
+                <div class="cb-text">That's great！You walk every day, don't you。Good job!！Next time7/12So don't forget 📅</div>
+                <div class="cb-time">6/26 20:15</div>
+              </div>
+            </div>
+
+            <!-- System -->
+            <div class="chat-bubble system">
+              <div class="cb-text">
+                ⚠️ AlertNotification — 6/27 21:00<br>Yesterdayのstep count was low（3,200 steps）。Weather：Decrease due to rain。
+              </div>
+            </div>
+
+            <!-- Family -->
+            <div class="chat-bubble family">
+              <div class="cb-avatar">👩</div>
+              <div class="cb-content">
+                <div class="cb-name">Yoko Tanaka（Daughter）</div>
+                <div class="cb-text">YesterdayIt was rainy, wasn't it。Don't push yourself too hard。TodayHow was？</div>
+                <div class="cb-time">6/28 8:00</div>
+              </div>
+            </div>
+
+            <!-- Parent -->
+            <div class="chat-bubble parent">
+              <div class="cb-avatar">👴</div>
+              <div class="cb-content">
+                <div class="cb-name">Masao Tanaka（Dad）</div>
+                <div class="cb-text">TodayThe weather was nice so I walked to the park！FeelingThat's great 🌳</div>
+                <div class="cb-time">6/28 10:30</div>
+              </div>
+            </div>
+
+            <!-- Family -->
+            <div class="chat-bubble family">
+              <div class="cb-avatar">👩</div>
+              <div class="cb-content">
+                <div class="cb-name">Yoko Tanaka（Daughter）</div>
+                <div class="cb-text">8,000 stepsor moreYou walked!！Amazing!！TodayKeep going!！💪</div>
+                <div class="cb-time">6/28 15:00</div>
+              </div>
+            </div>
+
+            <!-- Parent -->
+            <div class="chat-bubble parent">
+              <div class="cb-avatar">👴</div>
+              <div class="cb-content">
+                <div class="cb-name">Masao Tanaka（Dad）</div>
+                <div class="cb-text">Thank you。Knowing Yoko is watching over me keeps me going 😄</div>
+                <div class="cb-time">6/28 15:05</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick templates -->
+          <div style="font-size:12px;color:var(--text-light);margin-bottom:8px;font-weight:600;">Quick replyTemplate：</div>
+          <div class="quick-templates">
+            <div class="qt-btn">💪 TodayKeep going!！</div>
+            <div class="qt-btn">🎉 You worked hard！</div>
+            <div class="qt-btn">⚠️ Take care!</div>
+            <div class="qt-btn">📞 Call me!</div>
+            <div class="qt-btn">🏥 CheckupDon't forget</div>
+            <div class="qt-btn">🌿 WalkWalkinglike this！</div>
+          </div>
+
+          <!-- Message input -->
+          <div class="sec-title" style="font-size:13px;margin-top:14px;margin-bottom:8px;">✍️ おDad.にMessages</div>
+          <div class="send-box">
+            <textarea placeholder="MessagesEnter…" style="min-height:70px;"></textarea>
+            <div class="send-box-footer">
+              <span>In-app Notification will be sent to Masao Tanaka's smartphone</span>
+              <a href="#" class="btn-primary" style="padding:6px 14px;font-size:12px;">📤 Send</a>
+            </div>
+          </div>
+        </div>
+      </div><!-- /page-messages -->
+
+      <!-- ====== PAGE: ALERTS ====== -->
+      <div class="page" id="page-alerts">
+
+        <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:20px;">
+
+          <!-- Alert settings table -->
+          <div class="card">
+            <div class="sec-title">🔔 Alert TriggersSettings</div>
+            <table class="alert-settings-table">
+              <thead>
+                <tr>
+                  <th>SettingsItem</th>
+                  <th>Threshold</th>
+                  <th>Notification method</th>
+                  <th>ON/OFF</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>🚶 Stepsis low</strong><br><span style="font-size:11px;color:var(--text-light);">1のStepsがThresholdunder</span></td>
+                  <td>3,000 stepsunder</td>
+                  <td><span style="font-size:11px;background:#dcfce7;color:#166534;padding:2px 8px;border-radius:20px;font-weight:700;">LINE</span></td>
+                  <td>
+                    <label class="toggle">
+                      <input type="checkbox" checked>
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>❌ Consecutive zeroSteps</strong><br><span style="font-size:11px;color:var(--text-light);">StepsRecordsNonecontinues</span></td>
+                  <td>3 consecutive daysor more</td>
+                  <td>
+                    <span style="font-size:11px;background:#fee2e2;color:#991b1b;padding:2px 8px;border-radius:20px;font-weight:700;">Phone call</span>
+                    <span style="font-size:11px;background:#dcfce7;color:#166534;padding:2px 8px;border-radius:20px;font-weight:700;margin-left:4px;">LINE</span>
+                  </td>
+                  <td>
+                    <label class="toggle">
+                      <input type="checkbox" checked>
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>🏥 CheckupAbsentReminder</strong><br><span style="font-size:11px;color:var(--text-light);">CheckupScheduledday beforeSun</span></td>
+                  <td>前Sun 19:00</td>
+                  <td><span style="font-size:11px;background:#dcfce7;color:#166534;padding:2px 8px;border-radius:20px;font-weight:700;">LINE</span></td>
+                  <td>
+                    <label class="toggle">
+                      <input type="checkbox" checked>
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>💊 Blood PressureAbnormal</strong><br><span style="font-size:11px;color:var(--text-light);">CheckupMeasurementvalue is at thresholdExceededえ</span></td>
+                  <td>Systolic 140or more</td>
+                  <td>
+                    <span style="font-size:11px;background:#fee2e2;color:#991b1b;padding:2px 8px;border-radius:20px;font-weight:700;">Immediate alert</span>
+                  </td>
+                  <td>
+                    <label class="toggle">
+                      <input type="checkbox" checked>
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>⚖️ WeightSudden change</strong><br><span style="font-size:11px;color:var(--text-light);">MonthlyWeightFluctuation</span></td>
+                  <td>±3kg/Mon</td>
+                  <td><span style="font-size:11px;background:#dcfce7;color:#166534;padding:2px 8px;border-radius:20px;font-weight:700;">LINE</span></td>
+                  <td>
+                    <label class="toggle">
+                      <input type="checkbox">
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>🏆 StepsGoal achieved</strong><br><span style="font-size:11px;color:var(--text-light);">110,000 stepsor moreAchieved</span></td>
+                  <td>10,000 stepsor more</td>
+                  <td><span style="font-size:11px;background:#dcfce7;color:#166534;padding:2px 8px;border-radius:20px;font-weight:700;">LINE</span></td>
+                  <td>
+                    <label class="toggle">
+                      <input type="checkbox" checked>
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Notification settings -->
+          <div style="display:flex;flex-direction:column;gap:16px;">
+            <div class="card">
+              <div class="sec-title" style="font-size:13px;">📱 Notification method</div>
+              <div class="notif-method-row" style="flex-direction:column;gap:8px;">
+                <div class="notif-method active">
+                  <span>💬</span> LINE
+                  <span style="margin-left:auto;font-size:11px;color:var(--green-dark);">✅ Connected</span>
+                </div>
+                <div class="notif-method">
+                  <span>📱</span> SMS
+                  <span style="margin-left:auto;font-size:11px;color:var(--text-light);">未Settings</span>
+                </div>
+                <div class="notif-method">
+                  <span>📧</span> Email
+                  <span style="margin-left:auto;font-size:11px;color:var(--text-light);">未Settings</span>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="sec-title" style="font-size:13px;">🌙 SilentTime</div>
+              <div style="font-size:13px;color:var(--text-mid);margin-bottom:10px;">NotificationStopTimeTime slot</div>
+              <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--blue-dark);">
+                <span>21:00</span>
+                <span style="color:var(--text-light);">〜</span>
+                <span>07:00</span>
+              </div>
+              <div style="font-size:11px;color:var(--text-light);margin-top:6px;">During this time period, non-emergency notifications will not be sent</div>
+              <button class="btn-ghost" style="margin-top:10px;width:100%;font-size:12px;">⏰ TimeChange</button>
+            </div>
+            <div class="card">
+              <div class="sec-title" style="font-size:13px;">👨‍👩‍👧 Contact priority order</div>
+              <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;color:var(--text-mid);">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="background:var(--blue-mid);color:#fff;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">1</span>
+                  Yoko Tanaka（Daughter）
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="background:var(--blue-light);color:var(--blue-dark);width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">2</span>
+                  Ken Tanaka一（Son）
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="background:#e0e0e0;color:#666;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">3</span>
+                  Shingu City Health Promotion Dept.
+                </div>
+              </div>
+              <button class="btn-ghost" style="margin-top:10px;width:100%;font-size:12px;">✏️ Change order</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alert history -->
+        <div class="card">
+          <div class="sec-title">📋 RecentAlert history（Past7間）</div>
+          <div class="alert-hist-item">
+            <div class="ahi-icon">⚠️</div>
+            <div class="ahi-body">
+              <div class="ahi-title">Low Steps Alert</div>
+              <div class="ahi-sub">6/27 — 3,200 steps（Threshold 3,000 stepsnear）、LINEにNotificationDone</div>
+            </div>
+            <div class="ahi-date">6/27</div>
+            <div class="ahi-badge triggered">Triggered</div>
+          </div>
+          <div class="alert-hist-item">
+            <div class="ahi-icon">🏥</div>
+            <div class="ahi-body">
+              <div class="ahi-title">CheckupDay-before reminder</div>
+              <div class="ahi-sub">6/25 19:00 — Next dayCheckup（Specific Health Checkup）をNotification</div>
+            </div>
+            <div class="ahi-date">6/25</div>
+            <div class="ahi-badge ok">SendCompleted</div>
+          </div>
+          <div class="alert-hist-item">
+            <div class="ahi-icon">🏆</div>
+            <div class="ahi-body">
+              <div class="ahi-title">StepsGoal achievedNotification</div>
+              <div class="ahi-sub">6/24 — 9,210 stepsAchieved！Target10,000 stepsnearbyAchievedをLINEReported via</div>
+            </div>
+            <div class="ahi-date">6/24</div>
+            <div class="ahi-badge ok">SendCompleted</div>
+          </div>
+          <div class="alert-hist-item">
+            <div class="ahi-icon">🏆</div>
+            <div class="ahi-body">
+              <div class="ahi-title">StepsGoal achievedNotification（10,000 stepsExceeded）</div>
+              <div class="ahi-sub">6/21 — Checkup dayに9,870 stepsAchieved。Goal10,000 stepsapproachingLINENotification</div>
+            </div>
+            <div class="ahi-date">6/21</div>
+            <div class="ahi-badge ok">SendCompleted</div>
+          </div>
+          <div class="alert-hist-item">
+            <div class="ahi-icon">💊</div>
+            <div class="ahi-body">
+              <div class="ahi-title">Blood Pressure Caution Alert</div>
+              <div class="ahi-sub">6/21 — Systolic Blood Pressure 138 mmHg recorded at checkup (threshold: near 140)</div>
+            </div>
+            <div class="ahi-date">6/21</div>
+            <div class="ahi-badge triggered">InformationNotification</div>
+          </div>
+        </div>
+      </div><!-- /page-alerts -->
+
+      <!-- ====== PAGE: COUNSELOR ====== -->
+      <div class="page" id="page-counselor">
+
+      <!-- ====== COUNSELOR DASHBOARD ====== -->
+      <div class="counselor-section">
+
+        <div class="counselor-section-header">
+          <div>
+            <div class="counselor-section-title">
+              🧑‍⚕️ CounselorDiagnosis Records
+              <span class="cs-badge">Checkup時Records</span>
+            </div>
+            <div class="counselor-section-sub">Counselor records from health checkup. / Latest: 2026/6/21 (Blood Pressure & Weight Screening)</div>
+          </div>
+          <a href="#" class="btn-ghost" style="font-size:12px; padding:7px 14px;">📋 全RecordsView</a>
+        </div>
+
+        <!-- Session selector tabs -->
+        <div class="session-tabs">
+          <div class="session-tab active">
+            <span class="tab-dot"></span>
+            6/21Sun Blood Pressure・WeightScreening
+          </div>
+          <div class="session-tab">
+            <span class="tab-dot"></span>
+            5/17Sun Bone density test
+          </div>
+          <div class="session-tab">
+            <span class="tab-dot"></span>
+            3/8Sun Specific Health Checkup
+          </div>
+          <div class="session-tab">
+            <span class="tab-dot"></span>
+            1/15Sun Physical fitnessScreening
+          </div>
+        </div>
+
+        <!-- 3-column cards -->
+        <div class="counselor-grid">
+
+          <!-- Card 1: Perceived Health Status -->
+          <div class="c-card">
+            <div class="c-card-header">
+              <div class="c-card-icon health">💚</div>
+              <div>
+                <div class="c-card-title">Perceived Health Status</div>
+                <div class="c-card-date">6/21Sun Counselor：Yamamoto Nurse</div>
+              </div>
+            </div>
+
+            <div class="health-score-row">
+              <span class="health-score-num">72</span>
+              <span class="health-score-max">/ 100</span>
+              <div class="health-score-label">Self-assessment score</div>
+            </div>
+
+            <!-- Gauge bar -->
+            <div style="margin-bottom: 14px;">
+              <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-light); margin-bottom:5px;">
+                <span>Self-rated mood & health</span><span>72pts</span>
+              </div>
+              <div style="height:10px; background:#ede8f8; border-radius:99px; overflow:hidden;">
+                <div style="width:72%; height:100%; background:linear-gradient(90deg,#c0a8e0,#7a5ab0); border-radius:99px;"></div>
+              </div>
+            </div>
+
+            <div class="health-chips">
+              <span class="h-chip good">Physical fitnessis normal</span>
+              <span class="h-chip good">Good appetite</span>
+              <span class="h-chip warn">leg and back fatigue</span>
+              <span class="h-chip note">Sleep is fairly good</span>
+              <span class="h-chip warn">Blood Pressureis concerned about</span>
+            </div>
+
+            <div style="margin-top:13px; padding:10px 13px; background:#f9f6ff; border:1px solid #ddd0f4; border-radius:10px; font-size:12px; color:var(--text-mid); line-height:1.6;">
+              「Lately I feel lighter on my feet thanks to the walks。However,、長TimeKnees get a little tired when walking」it was noted。
+            </div>
+          </div>
+
+          <!-- Card 2: Recent Concerns -->
+          <div class="c-card">
+            <div class="c-card-header">
+              <div class="c-card-icon worry">💛</div>
+              <div>
+                <div class="c-card-title">Recent Concerns</div>
+                <div class="c-card-date">6/21Sun Counselor：Yamamoto Nurse</div>
+              </div>
+            </div>
+
+            <div class="worry-list">
+              <div class="worry-item">
+                <span class="wi-icon">🦵</span>
+                <div class="wi-body">
+                  <div class="wi-title">Knee & back fatigue</div>
+                  <div class="wi-detail">長TimeのWalkingknee fatigue felt afterwards。Going up and down steps has become slightly difficult。</div>
+                </div>
+                <span class="wi-level mid">中</span>
+              </div>
+              <div class="worry-item">
+                <span class="wi-icon">😴</span>
+                <div class="wi-body">
+                  <div class="wi-title">Sometimes wakes up at night</div>
+                  <div class="wi-detail">Late night2〜3:00wakes up around this time。More frequent than before。</div>
+                </div>
+                <span class="wi-level mid">中</span>
+              </div>
+              <div class="worry-item">
+                <span class="wi-icon">💊</span>
+                <div class="wi-body">
+                  <div class="wi-title">Blood Pressureanxiety about medication</div>
+                  <div class="wi-detail">「Has vague anxiety about continuing medication」mentioned in conversation。</div>
+                </div>
+                <span class="wi-level low">Small</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3: Conversation Tendencies -->
+          <div class="c-card">
+            <div class="c-card-header">
+              <div class="c-card-icon chat">💙</div>
+              <div>
+                <div class="c-card-title">Conversation Tendencies</div>
+                <div class="c-card-date">6/21Sun Counselor：Yamamoto Nurse</div>
+              </div>
+            </div>
+
+            <div style="font-size:12px; color:var(--text-light); margin-bottom:10px;">Topics mentioned in conversation</div>
+
+            <div class="chat-topic-list">
+              <div class="ct-row">
+                <div class="ct-label">🌿 Agriculture & Nature</div>
+                <div class="ct-bar-wrap"><div class="ct-bar" style="width:72%"></div></div>
+                <div class="ct-pct">72%</div>
+              </div>
+              <div class="ct-row">
+                <div class="ct-label">👨‍👩‍👧 Family talk</div>
+                <div class="ct-bar-wrap"><div class="ct-bar" style="width:60%"></div></div>
+                <div class="ct-pct">60%</div>
+              </div>
+              <div class="ct-row">
+                <div class="ct-label">🏥 Health& body</div>
+                <div class="ct-bar-wrap"><div class="ct-bar" style="width:48%"></div></div>
+                <div class="ct-pct">48%</div>
+              </div>
+              <div class="ct-row">
+                <div class="ct-label">📺 Hobbies &TV</div>
+                <div class="ct-bar-wrap"><div class="ct-bar" style="width:35%"></div></div>
+                <div class="ct-pct">35%</div>
+              </div>
+              <div class="ct-row">
+                <div class="ct-label">😔 Loneliness & Anxiety</div>
+                <div class="ct-bar-wrap"><div class="ct-bar" style="width:22%"></div></div>
+                <div class="ct-pct">22%</div>
+              </div>
+            </div>
+
+            <div class="chat-memo" style="margin-top:12px;">
+              <div class="cm-label">📝 CounselorNotes</div>
+              spoke cheerfully overall。Vegetable exchangetopic made their face brighten noticeably。「Wants to eat vegetables with grandchildren」was an impressive topic。Slight expressions of lonelinessYes、Increasing contact frequency with family is desirable。
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Full counselor note -->
+        <div class="counselor-note-full">
+          <div class="cnf-header">
+            <span class="cnf-icon">📝</span>
+            <div>
+              <div class="cnf-title">CounselorOverall Assessment — 20266/21Sun</div>
+              <div class="cnf-date">In charge：Yamamoto Keiko Nurse ／ Shingu City Health Promotion Dept.</div>
+            </div>
+          </div>
+          <div class="cnf-body">
+            Mr. Tanaka is overall<strong>Goodmental state</strong>is being maintained。Vege Ta WalkのWalkingThe habit is well established,、「VegetablesExchangeLooking forward to being able to」and keeps motivation high。<br><br>
+            Physically,<strong>Blood PressureがSlightly elevated（138/88）</strong>remains a concern.。The patient is aware of leg and back fatigue,、長DistanceWalkingshorter thanTimefrequentWalkingtransition to this pattern is recommended.。<br><br>
+            Mentally & socially,、<strong>Slight comments about loneliness were observed</strong>。With familyPhone calland increasing visit frequency would be beneficial、This is expected to contribute to mental stability。Next Checkup（7/12Sun）follow-up is recommended。
+          </div>
+        </div>
+
+        <!-- Session history timeline -->
+        <div style="margin-top:20px;">
+          <div style="font-size:13px; font-weight:700; color:#5a3a8a; margin-bottom:12px;">📅 PastのDiagnosis RecordsList</div>
+          <div class="session-timeline">
+            <div class="st-item current">
+              <div class="st-date">20266/21Sun ⭐</div>
+              <div class="st-event">Blood Pressure・WeightScreening</div>
+              <div class="st-scores">
+                <span class="st-score-chip health">Health 72pts</span>
+                <span class="st-score-chip worry">Concern 中</span>
+                <span class="st-score-chip chat">Casual conversation Good</span>
+              </div>
+            </div>
+            <div class="st-item">
+              <div class="st-date">20265/17Sun</div>
+              <div class="st-event">Bone density test</div>
+              <div class="st-scores">
+                <span class="st-score-chip health">Health 68pts</span>
+                <span class="st-score-chip worry">Concern Small</span>
+                <span class="st-score-chip chat">Casual conversation Normal</span>
+              </div>
+            </div>
+            <div class="st-item">
+              <div class="st-date">20263/8Sun</div>
+              <div class="st-event">Specific Health Checkup</div>
+              <div class="st-scores">
+                <span class="st-score-chip health">Health 65pts</span>
+                <span class="st-score-chip worry">Concern 中</span>
+                <span class="st-score-chip chat">Casual conversation Good</span>
+              </div>
+            </div>
+            <div class="st-item">
+              <div class="st-date">20261/15Sun</div>
+              <div class="st-event">Physical fitnessScreening</div>
+              <div class="st-scores">
+                <span class="st-score-chip health">Health 60pts</span>
+                <span class="st-score-chip worry">Concern 高</span>
+                <span class="st-score-chip chat">Casual conversation below target</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <!-- ====== END COUNSELOR DASHBOARD ====== -->
+
+      </div><!-- /page-counselor -->
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /layout -->
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+
+    // ====== PAGE NAVIGATION ======
+    document.querySelectorAll('nav a[data-page]').forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        const target = link.dataset.page;
+        document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+        link.classList.add('active');
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById('page-' + target)?.classList.add('active');
+        const titles = {
+          dashboard: 'Masao Tanaka.のMonitoring Dashboard',
+          steps: 'Detailed Walking Records',
+          calendar: 'Monthly Activity Calendar',
+          checkup: 'Checkup Schedule・Records',
+          points: 'Points Status',
+          messages: 'Messages',
+          alerts: 'Alert Settings',
+          counselor: 'CounselorDiagnosis Records'
+        };
+        const h2 = document.querySelector('.topbar-left h2');
+        if (h2 && titles[target]) h2.textContent = titles[target];
+      });
+    });
+
+    // ====== FILTER TABS (steps page) ======
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const parent = tab.closest('.filter-tabs');
+        parent.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+      });
+    });
+
+    // ====== QUICK TEMPLATES (messages page) ======
+    document.querySelectorAll('.qt-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const textarea = document.querySelector('#page-messages .send-box textarea');
+        if (textarea) {
+          textarea.value = btn.textContent.trim().replace(/^[^\s]+\s/, '');
+          textarea.focus();
+        }
+      });
+    });
+
+    // Alert close
+    const alertBanner = document.querySelector('.alert-banner');
+    if (alertBanner) {
+      alertBanner.querySelector('.btn-ghost')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        alertBanner.style.display = 'none';
+      });
+    }
+
+    // Send message
+    const sendBtn = document.querySelector('.send-box .btn-primary');
+    const textarea = document.querySelector('.send-box textarea');
+    if (sendBtn && textarea) {
+      sendBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (textarea.value.trim()) {
+          alert(`✅ MessagesをSend.：\n「${textarea.value}」`);
+          textarea.value = '';
+        } else {
+          alert('MessagesEnterPlease。');
+        }
+      });
+    }
+
+    // Session tab switching
+    document.querySelectorAll('.session-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.session-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+      });
+    });
+
+    // Session timeline item switching
+    document.querySelectorAll('.st-item').forEach(item => {
+      item.addEventListener('click', () => {
+        document.querySelectorAll('.st-item').forEach(i => i.classList.remove('current'));
+        item.classList.add('current');
+        const date = item.querySelector('.st-date').textContent.replace('⭐','').trim();
+        const event = item.querySelector('.st-event').textContent;
+        // Update header date text
+        const sub = document.querySelector('.counselor-section-sub');
+        if (sub) sub.textContent = `Counselor records from health checkup. / Displaying: ${date} (${event})`;
+      });
+    });
+
+    // Calendar cell click
+    document.querySelectorAll('.cal-mini td.walk').forEach(td => {
+      td.addEventListener('click', () => {
+        const day = td.textContent.replace(/[^\d]/g, '');
+        if (day) alert(`6/${day}: Walking achieved ✅
+(See "Walking Records" for detailed data)`);
+      });
+    });
+  });
+</script>
+</body>
+</html>
