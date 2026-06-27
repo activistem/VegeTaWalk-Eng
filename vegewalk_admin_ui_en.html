@@ -1,0 +1,3713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vege Ta Walk — Administration Portal</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --navy:        #1b2d4f;
+    --navy-mid:    #2b4a7a;
+    --navy-light:  #4a72b0;
+    --navy-pale:   #eef2f9;
+    --green-dark:  #1f5c32;
+    --green-mid:   #3a8c52;
+    --green-light: #90d4a6;
+    --green-pale:  #eaf7ee;
+    --gold:        #b88a1a;
+    --gold-light:  #f5e9c0;
+    --red:         #b83232;
+    --red-pale:    #fceaea;
+    --orange:      #d4721a;
+    --orange-pale: #fdf0e2;
+    --text-dark:   #1a2435;
+    --text-mid:    #4a5e78;
+    --text-light:  #8a9eb8;
+    --bg:          #f2f5fa;
+    --card:        #ffffff;
+    --border:      #d0dcec;
+    --shadow:      0 2px 12px rgba(27,45,79,0.09);
+  }
+
+  body {
+    font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    background: var(--bg);
+    color: var(--text-dark);
+    min-height: 100vh;
+  }
+
+  .layout { display: flex; min-height: 100vh; }
+
+  /* ====== SIDEBAR ====== */
+  .sidebar {
+    width: 240px;
+    background: var(--navy);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+
+  .sidebar-logo {
+    padding: 24px 20px 18px;
+    border-bottom: 1px solid rgba(255,255,255,0.10);
+  }
+
+  .logo-row {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 6px;
+  }
+
+  .logo-icon { font-size: 26px; }
+
+  .logo-text h1 { color: #fff; font-size: 16px; font-weight: 700; line-height: 1.2; }
+  .logo-text .sub { color: rgba(255,255,255,0.55); font-size: 10px; margin-top: 1px; }
+
+  .gov-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.18);
+    color: rgba(255,255,255,0.80);
+    font-size: 11px;
+    padding: 4px 11px;
+    border-radius: 20px;
+    font-weight: 600;
+  }
+
+  .staff-info {
+    padding: 16px 18px;
+    border-bottom: 1px solid rgba(255,255,255,0.10);
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .staff-av {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: var(--navy-light);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    border: 2px solid rgba(255,255,255,0.2);
+    flex-shrink: 0;
+  }
+
+  .staff-name { color: #fff; font-size: 13px; font-weight: 600; }
+  .staff-role { color: rgba(255,255,255,0.55); font-size: 11px; margin-top: 2px; }
+
+  nav { flex: 1; padding: 12px 0; }
+
+  .nav-section {
+    padding: 10px 18px 4px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.10em;
+    color: rgba(255,255,255,0.35);
+    text-transform: uppercase;
+  }
+
+  nav a {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 20px;
+    color: rgba(255,255,255,0.65);
+    text-decoration: none; font-size: 13px; font-weight: 500;
+    transition: all 0.16s;
+    border-left: 3px solid transparent;
+  }
+
+  nav a .ico { font-size: 16px; }
+
+  nav a:hover { background: rgba(255,255,255,0.08); color: #fff; }
+
+  nav a.active {
+    background: rgba(255,255,255,0.13);
+    color: #fff;
+    border-left-color: #90b8f0;
+    font-weight: 700;
+  }
+
+  nav a .badge-num {
+    margin-left: auto;
+    background: var(--red);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 7px;
+    border-radius: 20px;
+    min-width: 20px;
+    text-align: center;
+  }
+
+  .sidebar-foot {
+    padding: 14px 18px;
+    border-top: 1px solid rgba(255,255,255,0.10);
+  }
+
+  .sidebar-foot a {
+    display: flex; align-items: center; gap: 8px;
+    color: rgba(255,255,255,0.45); text-decoration: none;
+    font-size: 12px; padding: 6px 2px;
+  }
+
+  /* ====== TOPBAR ====== */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  .topbar {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 36px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .topbar-left h2 { font-size: 20px; font-weight: 700; color: var(--navy); }
+  .topbar-left .sub { font-size: 12px; color: var(--text-light); margin-top: 1px; }
+
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    border-radius: 9px; padding: 9px 17px;
+    font-size: 13px; font-weight: 700;
+    cursor: pointer; transition: all 0.16s;
+    font-family: inherit; text-decoration: none; border: none;
+  }
+
+  .btn-primary { background: var(--navy-mid); color: #fff; }
+  .btn-primary:hover { background: var(--navy); }
+
+  .btn-green { background: var(--green-mid); color: #fff; }
+  .btn-green:hover { background: var(--green-dark); }
+
+  .btn-ghost {
+    background: transparent; color: var(--navy-mid);
+    border: 1.5px solid var(--border);
+  }
+  .btn-ghost:hover { background: var(--navy-pale); border-color: var(--navy-light); }
+
+  .btn-outline-red {
+    background: transparent; color: var(--red);
+    border: 1.5px solid #e8aaaa;
+    font-size: 12px; padding: 6px 13px;
+  }
+
+  .notif-btn {
+    width: 36px; height: 36px; border-radius: 50%;
+    border: 1px solid var(--border); background: var(--card);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px; cursor: pointer; position: relative;
+  }
+
+  .notif-dot {
+    position: absolute; top: 5px; right: 5px;
+    width: 8px; height: 8px; background: var(--red);
+    border-radius: 50%; border: 2px solid #fff;
+  }
+
+  /* ====== CONTENT ====== */
+  .content { flex: 1; overflow-y: auto; padding: 26px 36px 36px; }
+
+  /* ====== KPI ====== */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+
+  .kpi-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
+  }
+
+  .kpi-card .kc-label { font-size: 11px; color: var(--text-light); font-weight: 600; letter-spacing: 0.05em; margin-bottom: 6px; }
+  .kpi-card .kc-val { font-size: 28px; font-weight: 800; color: var(--navy); line-height: 1; }
+  .kpi-card .kc-unit { font-size: 12px; font-weight: 500; color: var(--text-mid); margin-left: 2px; }
+  .kpi-card .kc-diff { font-size: 11px; margin-top: 6px; }
+  .kpi-card .up { color: var(--green-mid); }
+  .kpi-card .down { color: var(--red); }
+
+  .kpi-card.accent { background: linear-gradient(135deg, var(--navy), var(--navy-mid)); border-color: var(--navy-mid); }
+  .kpi-card.accent .kc-label { color: rgba(255,255,255,0.65); }
+  .kpi-card.accent .kc-val { color: #fff; }
+  .kpi-card.accent .kc-unit { color: rgba(255,255,255,0.75); }
+  .kpi-card.accent .kc-diff { color: rgba(255,255,255,0.7); }
+
+  /* ====== MAIN GRID ====== */
+  .mid-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 22px; }
+
+  .card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 20px 22px;
+    box-shadow: var(--shadow);
+  }
+
+  .sec-title {
+    font-size: 15px; font-weight: 700; color: var(--navy);
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .sec-header {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;
+  }
+
+  /* ====== TABLE ====== */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .data-table th {
+    text-align: left;
+    padding: 8px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-light);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border-bottom: 1.5px solid var(--border);
+    background: var(--bg);
+  }
+
+  .data-table td {
+    padding: 11px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+    color: var(--text-dark);
+  }
+
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:hover td { background: var(--navy-pale); }
+
+  .user-cell { display: flex; align-items: center; gap: 9px; }
+  .user-av {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--navy-pale);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; flex-shrink: 0;
+  }
+
+  .user-name-cell { font-weight: 600; font-size: 13px; }
+  .user-area { font-size: 11px; color: var(--text-light); }
+
+  .status-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; font-weight: 700;
+    padding: 3px 10px; border-radius: 20px;
+  }
+
+  .status-badge.attended { background: var(--green-pale); color: var(--green-dark); }
+  .status-badge.scheduled { background: var(--gold-light); color: var(--gold); }
+  .status-badge.absent { background: var(--red-pale); color: var(--red); }
+  .status-badge.active { background: var(--navy-pale); color: var(--navy-mid); }
+
+  .pts-issued {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; font-weight: 700; color: var(--gold);
+    background: var(--gold-light); border-radius: 20px; padding: 3px 10px;
+  }
+
+  .pts-pending {
+    font-size: 11px; color: var(--text-light); font-style: italic;
+  }
+
+  .action-btns { display: flex; gap: 6px; }
+  .action-btn {
+    font-size: 11px; padding: 4px 10px; border-radius: 7px;
+    border: 1.5px solid var(--border); background: var(--card);
+    cursor: pointer; color: var(--text-mid); font-family: inherit;
+    transition: all 0.15s; font-weight: 600;
+  }
+  .action-btn:hover { background: var(--navy-pale); border-color: var(--navy-light); color: var(--navy); }
+  .action-btn.green { border-color: var(--green-light); color: var(--green-dark); }
+  .action-btn.green:hover { background: var(--green-pale); }
+
+  /* ====== CHECKUP SCHEDULE ====== */
+  .schedule-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .sched-item {
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex; align-items: center; gap: 12px;
+    transition: all 0.15s;
+    cursor: pointer;
+  }
+
+  .sched-item:hover { border-color: var(--navy-light); background: var(--navy-pale); }
+
+  .sched-item.upcoming { border-color: var(--gold); background: var(--gold-light); }
+
+  .sched-date-box {
+    text-align: center;
+    min-width: 46px;
+  }
+
+  .sched-month { font-size: 10px; color: var(--text-light); font-weight: 600; }
+  .sched-day { font-size: 26px; font-weight: 800; color: var(--navy); line-height: 1; }
+  .sched-item.upcoming .sched-day { color: var(--gold); }
+
+  .sched-divider { width: 1px; height: 40px; background: var(--border); }
+
+  .sched-info { flex: 1; }
+  .sched-name { font-size: 13px; font-weight: 700; color: var(--text-dark); margin-bottom: 2px; }
+  .sched-meta { font-size: 11px; color: var(--text-light); }
+
+  .sched-stat { text-align: right; }
+  .sched-count { font-size: 18px; font-weight: 800; color: var(--navy); }
+  .sched-label { font-size: 10px; color: var(--text-light); }
+
+  /* ====== STATS CHART ====== */
+  .bar-chart { display: flex; flex-direction: column; gap: 11px; }
+
+  .bc-row { display: flex; align-items: center; gap: 10px; }
+  .bc-label { font-size: 12px; color: var(--text-mid); min-width: 70px; }
+  .bc-bar-wrap { flex: 1; background: var(--bg); border-radius: 99px; height: 14px; overflow: hidden; }
+  .bc-bar { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--navy-light), var(--navy-mid)); transition: width 0.8s ease; }
+  .bc-bar.green { background: linear-gradient(90deg, var(--green-light), var(--green-mid)); }
+  .bc-val { font-size: 12px; font-weight: 700; color: var(--navy); min-width: 40px; text-align: right; }
+
+  /* ====== BOTTOM GRID ====== */
+  .bot-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+
+  /* ====== POINT ISSUANCE ====== */
+  .point-issue-form {
+    display: flex; flex-direction: column; gap: 11px;
+  }
+
+  .pif-row { display: flex; align-items: center; justify-content: space-between; }
+  .pif-label { font-size: 13px; color: var(--text-mid); font-weight: 500; }
+  .pif-val { font-size: 20px; font-weight: 800; color: var(--navy); }
+
+  .pif-input {
+    width: 100%; padding: 9px 14px;
+    border: 1.5px solid var(--border); border-radius: 9px;
+    font-size: 13px; font-family: inherit; color: var(--text-dark);
+    outline: none; background: #fff;
+    transition: border-color 0.15s;
+  }
+
+  .pif-input:focus { border-color: var(--navy-light); }
+
+  .pif-select {
+    width: 100%; padding: 9px 14px;
+    border: 1.5px solid var(--border); border-radius: 9px;
+    font-size: 13px; font-family: inherit; color: var(--text-dark);
+    outline: none; background: #fff; cursor: pointer;
+  }
+
+  .divider { height: 1px; background: var(--border); margin: 4px 0; }
+
+  /* ====== NOTICE / ALERT LIST ====== */
+  .notice-list { display: flex; flex-direction: column; gap: 9px; }
+
+  .notice-item {
+    border-radius: 10px; padding: 11px 14px;
+    border-left: 3px solid transparent;
+    font-size: 12px;
+  }
+
+  .notice-item.warn { background: var(--orange-pale); border-left-color: var(--orange); }
+  .notice-item.info { background: var(--navy-pale); border-left-color: var(--navy-light); }
+  .notice-item.success { background: var(--green-pale); border-left-color: var(--green-mid); }
+
+  .notice-item .ni-title { font-weight: 700; color: var(--text-dark); margin-bottom: 2px; }
+  .notice-item .ni-body { color: var(--text-mid); }
+
+  /* ====== MAP PLACEHOLDER ====== */
+  .map-placeholder {
+    background: linear-gradient(135deg, #e8f0f8, #d4e4f4);
+    border-radius: 11px;
+    height: 140px;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 6px;
+    border: 1px solid var(--border);
+    color: var(--text-light); font-size: 13px; margin-top: 12px;
+  }
+
+  .map-placeholder .mi { font-size: 32px; }
+
+  /* ====== TABS ====== */
+  .tab-bar {
+    display: flex; gap: 0; margin-bottom: 16px;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .tab {
+    padding: 9px 18px; font-size: 13px; font-weight: 600;
+    color: var(--text-light); cursor: pointer; border-bottom: 2px solid transparent;
+    margin-bottom: -2px; transition: all 0.15s;
+  }
+
+  .tab:hover { color: var(--navy); }
+  .tab.active { color: var(--navy); border-bottom-color: var(--navy-mid); }
+
+  /* ====== SEARCH ====== */
+  .search-bar {
+    display: flex; gap: 10px; margin-bottom: 14px; align-items: center;
+  }
+
+  .search-input {
+    flex: 1; padding: 9px 14px;
+    border: 1.5px solid var(--border); border-radius: 9px;
+    font-size: 13px; font-family: inherit; color: var(--text-dark);
+    outline: none; background: #fff;
+  }
+
+  .search-input:focus { border-color: var(--navy-light); }
+
+  .filter-select {
+    padding: 9px 14px;
+    border: 1.5px solid var(--border); border-radius: 9px;
+    font-size: 13px; font-family: inherit; color: var(--text-mid);
+    background: #fff; cursor: pointer; outline: none;
+  }
+
+  /* ====== PAGINATION ====== */
+  .pagination {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 14px; padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  .pg-info { font-size: 12px; color: var(--text-light); }
+
+  .pg-btns { display: flex; gap: 4px; }
+
+  .pg-btn {
+    width: 30px; height: 30px; border-radius: 7px;
+    border: 1.5px solid var(--border); background: var(--card);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; cursor: pointer;
+    color: var(--text-mid); transition: all 0.15s;
+  }
+
+  .pg-btn:hover { background: var(--navy-pale); border-color: var(--navy-light); }
+  .pg-btn.active { background: var(--navy-mid); border-color: var(--navy-mid); color: #fff; }
+
+  /* ====== PAGE SWITCHING ====== */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ====== PARTICIPANT MANAGEMENT PAGE ====== */
+  .pm-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .pm-title { font-size: 20px; font-weight: 700; color: var(--navy); }
+  .pm-sub   { font-size: 12px; color: var(--text-light); margin-top: 3px; }
+
+  .pm-event-selector {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--card); border: 1.5px solid var(--border);
+    border-radius: 10px; padding: 10px 16px;
+    margin-bottom: 18px;
+  }
+
+  .pm-event-label { font-size: 12px; color: var(--text-light); font-weight: 600; white-space: nowrap; }
+
+  .pm-event-select {
+    flex: 1; border: none; outline: none; font-size: 14px; font-weight: 700;
+    color: var(--navy); background: transparent; cursor: pointer;
+    font-family: inherit;
+  }
+
+  .pm-stats-row {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .pm-stat {
+    background: var(--card); border: 1.5px solid var(--border);
+    border-radius: 12px; padding: 14px 16px; box-shadow: var(--shadow);
+    display: flex; align-items: center; gap: 12px;
+  }
+
+  .pm-stat-icon { font-size: 22px; }
+  .pm-stat-val  { font-size: 22px; font-weight: 800; color: var(--navy); line-height: 1; }
+  .pm-stat-unit { font-size: 11px; color: var(--text-mid); margin-left: 2px; }
+  .pm-stat-label { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+
+  .pm-stat.green { border-color: var(--green-light); background: var(--green-pale); }
+  .pm-stat.green .pm-stat-val { color: var(--green-dark); }
+  .pm-stat.red   { border-color: #e8aaaa; background: var(--red-pale); }
+  .pm-stat.red   .pm-stat-val { color: var(--red); }
+  .pm-stat.gold  { border-color: #e0c87a; background: var(--gold-light); }
+  .pm-stat.gold  .pm-stat-val { color: var(--gold); }
+
+  /* Full-width participant table */
+  .pm-table-card {
+    background: var(--card); border: 1.5px solid var(--border);
+    border-radius: 16px; padding: 20px 22px; box-shadow: var(--shadow);
+  }
+
+  .pm-data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+  .pm-data-table th {
+    text-align: left; padding: 9px 12px;
+    font-size: 11px; font-weight: 700; color: var(--text-light);
+    letter-spacing: 0.05em; text-transform: uppercase;
+    border-bottom: 1.5px solid var(--border); background: var(--bg);
+    white-space: nowrap;
+  }
+
+  .pm-data-table td {
+    padding: 12px 12px; border-bottom: 1px solid var(--border);
+    vertical-align: middle; color: var(--text-dark);
+  }
+
+  .pm-data-table tr:last-child td { border-bottom: none; }
+  .pm-data-table tr:hover td     { background: var(--navy-pale); }
+
+  .result-preview {
+    display: flex; flex-direction: column; gap: 2px;
+    font-size: 11px; color: var(--text-mid);
+  }
+
+  .result-chip {
+    display: inline-flex; align-items: center; gap: 3px;
+    padding: 1px 7px; border-radius: 99px; font-size: 10px; font-weight: 600;
+  }
+
+  .result-chip.ok   { background: var(--green-pale); color: var(--green-dark); }
+  .result-chip.warn { background: var(--orange-pale); color: var(--orange); }
+  .result-chip.none { background: var(--bg); color: var(--text-light); border: 1px solid var(--border); }
+
+  .btn-input-result {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: var(--navy-mid); color: #fff;
+    border: none; border-radius: 8px; padding: 6px 13px;
+    font-size: 12px; font-weight: 700; cursor: pointer;
+    font-family: inherit; transition: background 0.15s; white-space: nowrap;
+  }
+
+  .btn-input-result:hover { background: var(--navy); }
+
+  .btn-input-result.done {
+    background: var(--green-pale); color: var(--green-dark);
+    border: 1.5px solid var(--green-light);
+  }
+
+  /* ====== RESULT INPUT MODAL ====== */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(10,20,40,0.55); z-index: 200;
+    align-items: center; justify-content: center;
+    padding: 20px;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal-box {
+    background: var(--card); border-radius: 18px;
+    width: 100%; max-width: 640px;
+    max-height: 90vh; overflow-y: auto;
+    box-shadow: 0 16px 56px rgba(10,20,40,0.28);
+  }
+
+  .modal-header {
+    padding: 22px 26px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: flex-start; justify-content: space-between;
+    position: sticky; top: 0; background: var(--card); z-index: 1;
+  }
+
+  .modal-header h3 { font-size: 17px; font-weight: 700; color: var(--navy); }
+  .modal-header .mh-sub { font-size: 12px; color: var(--text-light); margin-top: 3px; }
+  .modal-close {
+    font-size: 22px; cursor: pointer; color: var(--text-light);
+    line-height: 1; padding: 2px; flex-shrink: 0; margin-left: 12px;
+    background: none; border: none; font-family: inherit;
+  }
+  .modal-close:hover { color: var(--text-dark); }
+
+  .modal-body { padding: 20px 26px; }
+
+  .modal-section-title {
+    font-size: 12px; font-weight: 700; color: var(--navy);
+    letter-spacing: 0.06em; text-transform: uppercase;
+    padding-bottom: 8px; border-bottom: 1.5px solid var(--border);
+    margin-bottom: 14px; margin-top: 20px;
+  }
+
+  .modal-section-title:first-child { margin-top: 0; }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .form-grid.cols3 { grid-template-columns: 1fr 1fr 1fr; }
+
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-group.full { grid-column: 1 / -1; }
+
+  .form-label {
+    font-size: 11px; font-weight: 700; color: var(--text-mid); letter-spacing: 0.03em;
+  }
+
+  .form-label .unit { font-weight: 400; color: var(--text-light); margin-left: 4px; }
+
+  .form-input, .form-select, .form-textarea {
+    padding: 9px 12px;
+    border: 1.5px solid var(--border); border-radius: 9px;
+    font-size: 13px; font-family: inherit; color: var(--text-dark);
+    outline: none; background: #fff; transition: border-color 0.15s;
+    width: 100%;
+  }
+
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    border-color: var(--navy-light);
+  }
+
+  .form-input.warn { border-color: var(--orange); background: var(--orange-pale); }
+  .form-input.alert { border-color: var(--red); background: var(--red-pale); }
+
+  .form-hint { font-size: 11px; color: var(--text-light); }
+  .form-hint.warn { color: var(--orange); font-weight: 600; }
+  .form-hint.ok   { color: var(--green-mid); font-weight: 600; }
+
+  .form-textarea { resize: vertical; min-height: 70px; }
+
+  .bmi-display {
+    padding: 9px 12px; border-radius: 9px; font-size: 16px;
+    font-weight: 800; text-align: center;
+    border: 1.5px solid var(--border); background: var(--bg);
+    color: var(--navy);
+  }
+
+  .bp-row { display: flex; align-items: center; gap: 8px; }
+  .bp-slash { font-size: 20px; font-weight: 700; color: var(--text-light); }
+
+  .modal-footer {
+    padding: 16px 26px 22px;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+    justify-content: flex-end;
+  }
+
+  .participation-toggle {
+    display: flex; align-items: center; gap: 8px;
+    margin-right: auto;
+    font-size: 13px; font-weight: 600; color: var(--text-mid);
+    cursor: pointer;
+  }
+
+  .toggle-check {
+    width: 18px; height: 18px; border-radius: 5px;
+    border: 2px solid var(--border); background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; transition: all 0.15s; cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .toggle-check.checked { background: var(--green-mid); border-color: var(--green-mid); color: #fff; }
+
+  /* ====== PDF ATTACHMENT ====== */
+  .pdf-dropzone {
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 22px 18px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.18s;
+    background: var(--bg);
+    position: relative;
+  }
+  .pdf-dropzone:hover,
+  .pdf-dropzone.drag-over {
+    border-color: var(--navy-light);
+    background: var(--navy-pale);
+  }
+  .pdf-dropzone input[type="file"] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+  }
+  .pdf-dropzone .dz-icon   { font-size: 32px; margin-bottom: 8px; }
+  .pdf-dropzone .dz-main   { font-size: 13px; font-weight: 600; color: var(--navy); margin-bottom: 3px; }
+  .pdf-dropzone .dz-sub    { font-size: 11px; color: var(--text-light); }
+
+  /* Attached file strip */
+  .pdf-attached-strip {
+    display: none;
+    align-items: center;
+    gap: 12px;
+    border: 1.5px solid #b0d0f8;
+    border-radius: 10px;
+    padding: 11px 14px;
+    background: var(--navy-pale);
+    margin-top: 10px;
+  }
+  .pdf-attached-strip.visible { display: flex; }
+  .pas-icon  { font-size: 26px; flex-shrink: 0; }
+  .pas-info  { flex: 1; }
+  .pas-name  { font-size: 13px; font-weight: 700; color: var(--navy); }
+  .pas-meta  { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+  .pas-btns  { display: flex; gap: 6px; }
+  .pas-btn {
+    font-size: 11px; padding: 5px 12px; border-radius: 7px; font-weight: 700;
+    cursor: pointer; border: 1.5px solid; font-family: inherit; transition: all 0.15s;
+  }
+  .pas-btn.view   { background: var(--navy-mid); color: #fff; border-color: var(--navy-mid); }
+  .pas-btn.view:hover { background: var(--navy); }
+  .pas-btn.remove { background: #fff; color: var(--red); border-color: #e8aaaa; }
+  .pas-btn.remove:hover { background: var(--red-pale); }
+
+  /* PDF badge in table */
+  .pdf-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px;
+    background: var(--navy-pale); color: var(--navy-mid);
+    border: 1px solid var(--border); cursor: pointer; transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .pdf-badge:hover { background: var(--navy-mid); color: #fff; border-color: var(--navy-mid); }
+  .pdf-badge.none  { color: var(--text-light); cursor: default; background: var(--bg); }
+  .pdf-badge.none:hover { background: var(--bg); color: var(--text-light); border-color: var(--border); }
+
+  /* ====== PDF VIEWER MODAL ====== */
+  .pdf-viewer-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(5,12,28,0.72); z-index: 300;
+    align-items: center; justify-content: center;
+    padding: 24px;
+  }
+  .pdf-viewer-overlay.open { display: flex; }
+
+  .pdf-viewer-box {
+    background: #fff; border-radius: 16px;
+    width: 100%; max-width: 860px; height: 90vh;
+    display: flex; flex-direction: column;
+    box-shadow: 0 20px 60px rgba(5,12,28,0.36);
+    overflow: hidden;
+  }
+
+  .pdf-viewer-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 20px;
+    background: var(--navy); color: #fff;
+    flex-shrink: 0;
+  }
+  .pvh-icon  { font-size: 22px; }
+  .pvh-info  { flex: 1; }
+  .pvh-title { font-size: 15px; font-weight: 700; }
+  .pvh-sub   { font-size: 11px; opacity: 0.65; margin-top: 2px; }
+  .pvh-btns  { display: flex; gap: 8px; }
+  .pvh-btn {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 12px; font-weight: 700; padding: 7px 14px;
+    border-radius: 8px; cursor: pointer; border: none;
+    font-family: inherit; transition: all 0.15s;
+  }
+  .pvh-btn.dl    { background: var(--green-mid); color: #fff; }
+  .pvh-btn.dl:hover { background: var(--green-dark); }
+  .pvh-btn.close { background: rgba(255,255,255,0.15); color: #fff; }
+  .pvh-btn.close:hover { background: rgba(255,255,255,0.28); }
+
+  .pdf-viewer-toolbar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 16px;
+    background: #f0f4fa; border-bottom: 1px solid var(--border);
+    flex-shrink: 0; font-size: 12px; color: var(--text-mid);
+  }
+  .pvt-page-info { flex: 1; }
+  .pvt-zoom { display: flex; align-items: center; gap: 6px; }
+  .pvt-btn {
+    width: 28px; height: 28px; border-radius: 6px;
+    border: 1.5px solid var(--border); background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 14px; font-weight: 700; color: var(--navy);
+    transition: all 0.13s;
+  }
+  .pvt-btn:hover { background: var(--navy-pale); border-color: var(--navy-light); }
+
+  .pdf-viewer-frame {
+    flex: 1; width: 100%; border: none; background: #e8ecf2;
+    display: block;
+  }
+
+  /* Placeholder when no PDF loaded */
+  .pdf-placeholder {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 14px; color: var(--text-light);
+    background: #f4f7fb;
+  }
+  .pdf-placeholder .pp-icon { font-size: 56px; opacity: 0.4; }
+  .pdf-placeholder .pp-text { font-size: 14px; }
+  .pdf-placeholder .pp-sub  { font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-row">
+        <span class="logo-icon">🥦</span>
+        <div class="logo-text">
+          <h1>Vege Ta Walk</h1>
+          <div class="sub">Administration Portal</div>
+        </div>
+      </div>
+      <span class="gov-badge">🏛 Health Promotion Division, Shingu City</span>
+    </div>
+
+    <div class="staff-info">
+      <div class="staff-av">👩‍💼</div>
+      <div>
+        <div class="staff-name">Keiko Yamamoto</div>
+        <div class="staff-role">Staff in charge / Health Promotion Division</div>
+      </div>
+    </div>
+
+    <nav>
+      <div class="nav-section">Main</div>
+      <a href="#" class="active" data-page="dashboard"><span class="ico">📊</span> Dashboard</a>
+      <a href="#" data-page="participants"><span class="ico">👥</span> Participant management <span class="badge-num">3</span></a>
+      <a href="#" data-page="schedule"><span class="ico">📅</span> Check-up schedule</a>
+      <a href="#" data-page="points"><span class="ico">🌟</span> Point grant</a>
+
+      <div class="nav-section">Analysis & integration</div>
+      <a href="#" data-page="stats"><span class="ico">📈</span> Statistics & reports</a>
+      <a href="#" data-page="farmers"><span class="ico">🥕</span> Farm coordination</a>
+      <a href="#" data-page="notices"><span class="ico">💬</span> Announcement delivery</a>
+
+      <div class="nav-section">Settings</div>
+      <a href="#" data-page="settings"><span class="ico">⚙️</span> System settings</a>
+      <a href="#" data-page="access"><span class="ico">🔒</span> Access permissions</a>
+    </nav>
+
+    <div class="sidebar-foot">
+      <a href="#">❓ Help & manual</a>
+      <a href="#">🚪 Log out</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <h2>Dashboard — June 2026</h2>
+        <div class="sub">Shingu City Vege Ta Walk Operations Management / Last updated: June 28, 2026 14:35</div>
+      </div>
+      <div class="topbar-right">
+        <a href="#" class="btn btn-ghost">📥 Export CSV</a>
+        <a href="#" class="btn btn-green">📋 Register a new check-up</a>
+        <div class="notif-btn">🔔<span class="notif-dot"></span></div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+    <!-- ===== DASHBOARD PAGE ===== -->
+    <div class="page active" id="page-dashboard">
+
+      <!-- KPI -->
+      <div class="kpi-grid">
+        <div class="kpi-card accent">
+          <div class="kc-label">Registered users</div>
+          <div><span class="kc-val">1,284</span><span class="kc-unit">people</span></div>
+          <div class="kc-diff">▲ +42 people vs last month</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kc-label">This month’s check-up participants</div>
+          <div><span class="kc-val">318</span><span class="kc-unit">people</span></div>
+          <div class="kc-diff up">▲ +28 people vs last month</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kc-label">Points issued this month</div>
+          <div><span class="kc-val">24,680</span><span class="kc-unit">pt</span></div>
+          <div class="kc-diff up">▲ +3,200pt vs last month</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kc-label">Vegetable exchanges (this month)</div>
+          <div><span class="kc-val">89</span><span class="kc-unit">items</span></div>
+          <div class="kc-diff up">▲ +14 items vs last month</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kc-label">Non-participant follow-up targets</div>
+          <div><span class="kc-val">37</span><span class="kc-unit">people</span></div>
+          <div class="kc-diff down">▼ Action needed</div>
+        </div>
+      </div>
+
+      <!-- MID GRID -->
+      <div class="mid-grid">
+
+        <!-- Left: Participant Table -->
+        <div class="card">
+          <div class="sec-header">
+            <div class="sec-title" style="margin-bottom:0">👥 Participant list — July 12 Specific Health Check-up</div>
+            <div style="display:flex; gap:8px;">
+              <a href="#" class="btn btn-ghost" style="font-size:12px; padding:7px 13px;">Filter</a>
+              <a href="#" class="btn btn-green" style="font-size:12px; padding:7px 13px;">+ Add manually</a>
+            </div>
+          </div>
+
+          <div class="search-bar">
+            <input class="search-input" type="text" placeholder="🔍 Search by name or ID…">
+            <select class="filter-select">
+              <option>All statuses</option>
+              <option>Expected to attend</option>
+              <option>Participated</option>
+              <option>Did not attend</option>
+            </select>
+          </div>
+
+          <div class="tab-bar">
+            <div class="tab active">Expected (42)</div>
+            <div class="tab">Participated (318)</div>
+            <div class="tab">Did not attend (37)</div>
+          </div>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Participants</th>
+                <th>Age</th>
+                <th>Status</th>
+                <th>Points held</th>
+                <th>Point grant</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="user-cell">
+                    <div class="user-av">👴</div>
+                    <div>
+                      <div class="user-name-cell">Masao Tanaka</div>
+                      <div class="user-area">North Shingu / ID:1084</div>
+                    </div>
+                  </div>
+                </td>
+                <td>Age 75</td>
+                <td><span class="status-badge scheduled">📋 Expected to attend</span></td>
+                <td>418 pt</td>
+                <td><span class="pts-pending">Grant on the day</span></td>
+                <td>
+                  <div class="action-btns">
+                    <button class="action-btn green" onclick="issuePoints(this, 'Masao Tanaka')">✅ Point grant</button>
+                    <button class="action-btn">Details</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="user-cell">
+                    <div class="user-av">👵</div>
+                    <div>
+                      <div class="user-name-cell">Kazuko Sato</div>
+                      <div class="user-area">South Shingu / ID:0922</div>
+                    </div>
+                  </div>
+                </td>
+                <td>Age 71</td>
+                <td><span class="status-badge attended">✅ Participated</span></td>
+                <td>552 pt</td>
+                <td><span class="pts-issued">🌟 +50pt issued</span></td>
+                <td>
+                  <div class="action-btns">
+                    <button class="action-btn">Details</button>
+                    <button class="action-btn btn-outline-red">Cancel</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="user-cell">
+                    <div class="user-av">👴</div>
+                    <div>
+                      <div class="user-name-cell">Ichiro Suzuki</div>
+                      <div class="user-area">Tanabe City / ID:1142</div>
+                    </div>
+                  </div>
+                </td>
+                <td>Age 68</td>
+                <td><span class="status-badge scheduled">📋 Expected to attend</span></td>
+                <td>287 pt</td>
+                <td><span class="pts-pending">Grant on the day</span></td>
+                <td>
+                  <div class="action-btns">
+                    <button class="action-btn green" onclick="issuePoints(this, 'Ichiro Suzuki')">✅ Point grant</button>
+                    <button class="action-btn">Details</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="user-cell">
+                    <div class="user-av">👵</div>
+                    <div>
+                      <div class="user-name-cell">Miyo Takahashi</div>
+                      <div class="user-area">East Shingu / ID:0761</div>
+                    </div>
+                  </div>
+                </td>
+                <td>Age 80</td>
+                <td><span class="status-badge absent">❌ Did not attend</span></td>
+                <td>190 pt</td>
+                <td><span class="pts-pending">—</span></td>
+                <td>
+                  <div class="action-btns">
+                    <button class="action-btn" onclick="sendReminder('Miyo Takahashi')">📩 Reminder</button>
+                    <button class="action-btn">Details</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="user-cell">
+                    <div class="user-av">👴</div>
+                    <div>
+                      <div class="user-name-cell">Shigeru Nakamura</div>
+                      <div class="user-area">Kumano City / ID:1310</div>
+                    </div>
+                  </div>
+                </td>
+                <td>Age 73</td>
+                <td><span class="status-badge attended">✅ Participated</span></td>
+                <td>634 pt</td>
+                <td><span class="pts-issued">🌟 +50pt issued</span></td>
+                <td>
+                  <div class="action-btns">
+                    <button class="action-btn">Details</button>
+                    <button class="action-btn btn-outline-red">Cancel</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="pagination">
+            <div class="pg-info">397 total / showing 1–5</div>
+            <div class="pg-btns">
+              <div class="pg-btn">‹</div>
+              <div class="pg-btn active">1</div>
+              <div class="pg-btn">2</div>
+              <div class="pg-btn">3</div>
+              <div class="pg-btn">…</div>
+              <div class="pg-btn">80</div>
+              <div class="pg-btn">›</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Schedule + Stats -->
+        <div style="display:flex; flex-direction:column; gap:18px;">
+
+          <!-- Schedule -->
+          <div class="card">
+            <div class="sec-header">
+              <div class="sec-title" style="margin-bottom:0">📅 Check-up schedule</div>
+              <a href="#" class="btn btn-ghost" style="font-size:11px; padding:5px 11px;">View all</a>
+            </div>
+            <div class="schedule-list">
+              <div class="sched-item upcoming">
+                <div class="sched-date-box">
+                  <div class="sched-month">July</div>
+                  <div class="sched-day">12</div>
+                </div>
+                <div class="sched-divider"></div>
+                <div class="sched-info">
+                  <div class="sched-name">Specific Health Check-up FY2026</div>
+                  <div class="sched-meta">Shingu Civic Hall / 9:00–16:00</div>
+                </div>
+                <div class="sched-stat">
+                  <div class="sched-count">42</div>
+                  <div class="sched-label">Expected to attend</div>
+                </div>
+              </div>
+              <div class="sched-item">
+                <div class="sched-date-box">
+                  <div class="sched-month">August</div>
+                  <div class="sched-day">9</div>
+                </div>
+                <div class="sched-divider"></div>
+                <div class="sched-info">
+                  <div class="sched-name">Eye examination</div>
+                  <div class="sched-meta">Shingu Health Center / 10:00–</div>
+                </div>
+                <div class="sched-stat">
+                  <div class="sched-count">18</div>
+                  <div class="sched-label">Expected to attend</div>
+                </div>
+              </div>
+              <div class="sched-item">
+                <div class="sched-date-box">
+                  <div class="sched-month">June</div>
+                  <div class="sched-day">21</div>
+                </div>
+                <div class="sched-divider"></div>
+                <div class="sched-info">
+                  <div class="sched-name">Blood Pressure & Weight Measurement Session</div>
+                  <div class="sched-meta">Tanabe Cultural Center / completed</div>
+                </div>
+                <div class="sched-stat">
+                  <div class="sched-count">318</div>
+                  <div class="sched-label">Participated</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stats -->
+          <div class="card">
+            <div class="sec-title">📈 Monthly participation-rate trend</div>
+            <div class="bar-chart">
+              <div class="bc-row">
+                <div class="bc-label">January</div>
+                <div class="bc-bar-wrap"><div class="bc-bar" style="width:52%"></div></div>
+                <div class="bc-val">52%</div>
+              </div>
+              <div class="bc-row">
+                <div class="bc-label">February</div>
+                <div class="bc-bar-wrap"><div class="bc-bar" style="width:58%"></div></div>
+                <div class="bc-val">58%</div>
+              </div>
+              <div class="bc-row">
+                <div class="bc-label">March</div>
+                <div class="bc-bar-wrap"><div class="bc-bar" style="width:63%"></div></div>
+                <div class="bc-val">63%</div>
+              </div>
+              <div class="bc-row">
+                <div class="bc-label">April</div>
+                <div class="bc-bar-wrap"><div class="bc-bar green" style="width:71%"></div></div>
+                <div class="bc-val">71%</div>
+              </div>
+              <div class="bc-row">
+                <div class="bc-label">May</div>
+                <div class="bc-bar-wrap"><div class="bc-bar green" style="width:76%"></div></div>
+                <div class="bc-val">76%</div>
+              </div>
+              <div class="bc-row">
+                <div class="bc-label">June</div>
+                <div class="bc-bar-wrap"><div class="bc-bar green" style="width:80%"></div></div>
+                <div class="bc-val">80%</div>
+              </div>
+            </div>
+            <div style="margin-top:12px; font-size:11px; color:var(--text-light); text-align:right;">
+              ※ Since introducing Vege Ta Walk, the participation rate has improved continuously
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM GRID -->
+      <div class="bot-grid">
+
+        <!-- Point Issuance Panel -->
+        <div class="card">
+          <div class="sec-title">🌟 Bulk point grant</div>
+          <div class="point-issue-form">
+            <div>
+              <div style="font-size:11px; color:var(--text-light); margin-bottom:5px; font-weight:600;">Target check-up event</div>
+              <select class="pif-select">
+                <option>July 12 Specific Health Check-up FY2026</option>
+                <option>August 9 Eye Examination</option>
+                <option>June 21 Blood Pressure & Weight Measurement Session</option>
+              </select>
+            </div>
+            <div>
+              <div style="font-size:11px; color:var(--text-light); margin-bottom:5px; font-weight:600;">Points granted</div>
+              <input class="pif-input" type="number" value="50" min="1" max="500">
+            </div>
+            <div>
+              <div style="font-size:11px; color:var(--text-light); margin-bottom:5px; font-weight:600;">Targets</div>
+              <select class="pif-select">
+                <option>All confirmed participants (318)</option>
+                <option>Expected participants (42)</option>
+                <option>Specify individually…</option>
+              </select>
+            </div>
+            <div class="divider"></div>
+            <div class="pif-row">
+              <span class="pif-label">Total points granted</span>
+              <span class="pif-val">15,900 pt</span>
+            </div>
+            <div class="pif-row">
+              <span style="font-size:11px; color:var(--text-light);">318 targets × 50pt</span>
+            </div>
+            <a href="#" class="btn btn-green" style="width:100%; justify-content:center; margin-top:4px;" onclick="bulkIssue(event)">🌟 Execute bulk grant</a>
+          </div>
+        </div>
+
+        <!-- Alerts / Notices -->
+        <div class="card">
+          <div class="sec-header">
+            <div class="sec-title" style="margin-bottom:0">🔔 Alerts & notifications</div>
+            <a href="#" class="btn btn-ghost" style="font-size:11px; padding:5px 11px;">View all</a>
+          </div>
+          <div class="notice-list">
+            <div class="notice-item warn">
+              <div class="ni-title">⚠️ Non-participant follow-up targets: 37 people</div>
+              <div class="ni-body">There are seniors who haven’t attended a check-up in the past 3 months. Please consider sending a reminder.</div>
+            </div>
+            <div class="notice-item info">
+              <div class="ni-title">📋 July 12 Specific Health Check-up — 2 weeks prior</div>
+              <div class="ni-body">Send an advance reminder to the 42 expected participants?</div>
+            </div>
+            <div class="notice-item success">
+              <div class="ni-title">✅ June point grant completed</div>
+              <div class="ni-body">Granted a total of 15,900pt to 318 people (completed 6/22).</div>
+            </div>
+            <div class="notice-item info">
+              <div class="ni-title">🥕 Farm inventory alert: carrots, 3 left</div>
+              <div class="ni-body">Stock of off-spec carrots from Tamura Farm is running low. Please arrange a restock.</div>
+            </div>
+          </div>
+          <div style="margin-top:12px;">
+            <a href="#" class="btn btn-primary" style="width:100%; justify-content:center; font-size:12px;" onclick="sendReminders(event)">📩 Send a bulk reminder to non-participants</a>
+          </div>
+        </div>
+
+        <!-- Area Map & Distribution -->
+        <div class="card">
+          <div class="sec-title">📍 Participation by district</div>
+          <div class="bar-chart">
+            <div class="bc-row">
+              <div class="bc-label">North Shingu</div>
+              <div class="bc-bar-wrap"><div class="bc-bar green" style="width:85%"></div></div>
+              <div class="bc-val">85%</div>
+            </div>
+            <div class="bc-row">
+              <div class="bc-label">South Shingu</div>
+              <div class="bc-bar-wrap"><div class="bc-bar green" style="width:78%"></div></div>
+              <div class="bc-val">78%</div>
+            </div>
+            <div class="bc-row">
+              <div class="bc-label">East Shingu</div>
+              <div class="bc-bar-wrap"><div class="bc-bar" style="width:64%"></div></div>
+              <div class="bc-val">64%</div>
+            </div>
+            <div class="bc-row">
+              <div class="bc-label">Tanabe City</div>
+              <div class="bc-bar-wrap"><div class="bc-bar" style="width:71%"></div></div>
+              <div class="bc-val">71%</div>
+            </div>
+            <div class="bc-row">
+              <div class="bc-label">Kumano City</div>
+              <div class="bc-bar-wrap"><div class="bc-bar" style="width:59%"></div></div>
+              <div class="bc-val">59%</div>
+            </div>
+          </div>
+          <div class="map-placeholder">
+            <span class="mi">🗺️</span>
+            <span>Map view (shown when implemented)</span>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /page-dashboard -->
+
+    <!-- ===== PARTICIPANTS PAGE ===== -->
+    <div class="page" id="page-participants">
+
+      <div class="pm-header">
+        <div>
+          <div class="pm-title">👥 Participant management</div>
+          <div class="pm-sub">Check the participant roster, enter check-up results, and grant points</div>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <a href="#" class="btn btn-ghost">📥 Export roster as CSV</a>
+          <a href="#" class="btn btn-green">+ Add a participant</a>
+        </div>
+      </div>
+
+      <!-- Event selector -->
+      <div class="pm-event-selector">
+        <span class="pm-event-label">Target check-up:</span>
+        <select class="pm-event-select">
+          <option>📋 July 12 (Sat) Specific Health Check-up FY2026 — Shingu Civic Hall</option>
+          <option>🔬 August 9 (Sun) Eye Examination — Shingu Health Center</option>
+          <option>✅ June 21 (Sat) Blood Pressure & Weight Measurement Session (completed)</option>
+        </select>
+        <span style="font-size:12px; background:var(--gold-light); color:var(--gold); border:1px solid #e0c87a; border-radius:20px; padding:3px 12px; font-weight:700; white-space:nowrap;">14 days before the event</span>
+      </div>
+
+      <!-- Stats row -->
+      <div class="pm-stats-row">
+        <div class="pm-stat">
+          <span class="pm-stat-icon">👥</span>
+          <div>
+            <div><span class="pm-stat-val">397</span><span class="pm-stat-unit">people</span></div>
+            <div class="pm-stat-label">Total registered</div>
+          </div>
+        </div>
+        <div class="pm-stat gold">
+          <span class="pm-stat-icon">📋</span>
+          <div>
+            <div><span class="pm-stat-val">42</span><span class="pm-stat-unit">people</span></div>
+            <div class="pm-stat-label">Expected to attend</div>
+          </div>
+        </div>
+        <div class="pm-stat green">
+          <span class="pm-stat-icon">✅</span>
+          <div>
+            <div><span class="pm-stat-val">318</span><span class="pm-stat-unit">people</span></div>
+            <div class="pm-stat-label">Results entered</div>
+          </div>
+        </div>
+        <div class="pm-stat red">
+          <span class="pm-stat-icon">⚠️</span>
+          <div>
+            <div><span class="pm-stat-val">37</span><span class="pm-stat-unit">people</span></div>
+            <div class="pm-stat-label">Did not attend · not entered</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table card -->
+      <div class="pm-table-card">
+        <div class="sec-header">
+          <div class="sec-title" style="margin-bottom:0">Participant roster — result entry</div>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <span style="font-size:11px; color:var(--text-light);">Not entered <strong style="color:var(--orange)">79 people</strong></span>
+            <a href="#" class="btn btn-ghost" style="font-size:11px; padding:6px 12px;">Filter</a>
+          </div>
+        </div>
+
+        <div class="search-bar">
+          <input class="search-input" type="text" placeholder="🔍 Search by name, ID, or district…" id="pm-search">
+          <select class="filter-select" id="pm-filter">
+            <option value="">All</option>
+            <option value="entered">Results entered</option>
+            <option value="pending">Not entered (participated)</option>
+            <option value="scheduled">Expected to attend</option>
+            <option value="absent">Did not attend</option>
+          </select>
+          <select class="filter-select">
+            <option>All districts</option>
+            <option>North Shingu</option>
+            <option>South Shingu</option>
+            <option>East Shingu</option>
+            <option>Tanabe City</option>
+            <option>Kumano City</option>
+          </select>
+        </div>
+
+        <table class="pm-data-table" id="pm-table">
+          <thead>
+            <tr>
+              <th>Participants</th>
+              <th>Age / Gender</th>
+              <th>Status</th>
+              <th>Latest check-up results</th>
+              <th>Points</th>
+              <th style="text-align:center;">Counseling PDF</th>
+              <th style="text-align:center;">Result entry</th>
+            </tr>
+          </thead>
+          <tbody id="pm-tbody">
+            <!-- Row 1: Entered -->
+            <tr data-status="entered">
+              <td>
+                <div class="user-cell">
+                  <div class="user-av">👵</div>
+                  <div>
+                    <div class="user-name-cell">Kazuko Sato</div>
+                    <div class="user-area">South Shingu / ID:0922</div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-size:13px;">Age 71 / Female</td>
+              <td><span class="status-badge attended">✅ Participated</span></td>
+              <td>
+                <div class="result-preview">
+                  <span class="result-chip ok">BP 118/74</span>
+                  <span class="result-chip ok">Weight 52.3kg BMI 21.4</span>
+                  <span class="result-chip ok">Glucose 98mg/dL</span>
+                </div>
+              </td>
+              <td><span class="pts-issued">🌟 +50pt</span></td>
+              <td style="text-align:center;" class="pdf-cell" data-uid="0922">
+                <span class="pdf-badge" onclick="openPDFViewer('Kazuko Sato', '0922')">📄 View PDF</span>
+              </td>
+              <td style="text-align:center;">
+                <button class="btn-input-result done" onclick="openModal('Kazuko Sato', '0922', true)">✏️ Review/edit results</button>
+              </td>
+            </tr>
+            <!-- Row 2: Entered -->
+            <tr data-status="entered">
+              <td>
+                <div class="user-cell">
+                  <div class="user-av">👴</div>
+                  <div>
+                    <div class="user-name-cell">Shigeru Nakamura</div>
+                    <div class="user-area">Kumano City / ID:1310</div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-size:13px;">Age 73 / Male</td>
+              <td><span class="status-badge attended">✅ Participated</span></td>
+              <td>
+                <div class="result-preview">
+                  <span class="result-chip warn">BP 145/90 ⚠️</span>
+                  <span class="result-chip ok">Weight 67.8kg BMI 24.2</span>
+                  <span class="result-chip warn">Glucose 118mg/dL ⚠️</span>
+                </div>
+              </td>
+              <td><span class="pts-issued">🌟 +50pt</span></td>
+              <td style="text-align:center;" class="pdf-cell" data-uid="1310">
+                <span class="pdf-badge" onclick="openPDFViewer('Shigeru Nakamura', '1310')">📄 View PDF</span>
+              </td>
+              <td style="text-align:center;">
+                <button class="btn-input-result done" onclick="openModal('Shigeru Nakamura', '1310', true)">✏️ Review/edit results</button>
+              </td>
+            </tr>
+            <!-- Row 3: Not entered (participated) -->
+            <tr data-status="pending">
+              <td>
+                <div class="user-cell">
+                  <div class="user-av">👴</div>
+                  <div>
+                    <div class="user-name-cell">Masao Tanaka</div>
+                    <div class="user-area">North Shingu / ID:1084</div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-size:13px;">Age 75 / Male</td>
+              <td><span class="status-badge attended">✅ Participated</span></td>
+              <td>
+                <div class="result-preview">
+                  <span class="result-chip none">Not entered</span>
+                </div>
+              </td>
+              <td><span class="pts-issued">🌟 +50pt</span></td>
+              <td style="text-align:center;" class="pdf-cell" data-uid="1084">
+                <span class="pdf-badge none">📄 Not attached</span>
+              </td>
+              <td style="text-align:center;">
+                <button class="btn-input-result" onclick="openModal('Masao Tanaka', '1084', false)">📝 Enter results</button>
+              </td>
+            </tr>
+            <!-- Row 4: Not entered (participated) -->
+            <tr data-status="pending">
+              <td>
+                <div class="user-cell">
+                  <div class="user-av">👴</div>
+                  <div>
+                    <div class="user-name-cell">Ichiro Suzuki</div>
+                    <div class="user-area">Tanabe City / ID:1142</div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-size:13px;">Age 68 / Male</td>
+              <td><span class="status-badge attended">✅ Participated</span></td>
+              <td>
+                <div class="result-preview">
+                  <span class="result-chip none">Not entered</span>
+                </div>
+              </td>
+              <td><span class="pts-issued">🌟 +50pt</span></td>
+              <td style="text-align:center;" class="pdf-cell" data-uid="1142">
+                <span class="pdf-badge none">📄 Not attached</span>
+              </td>
+              <td style="text-align:center;">
+                <button class="btn-input-result" onclick="openModal('Ichiro Suzuki', '1142', false)">📝 Enter results</button>
+              </td>
+            </tr>
+            <!-- Row 5: Expected to attend -->
+            <tr data-status="scheduled">
+              <td>
+                <div class="user-cell">
+                  <div class="user-av">👵</div>
+                  <div>
+                    <div class="user-name-cell">Sachiko Yamada</div>
+                    <div class="user-area">North Shingu / ID:0845</div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-size:13px;">Age 69 / Female</td>
+              <td><span class="status-badge scheduled">📋 Expected to attend</span></td>
+              <td>
+                <div class="result-preview">
+                  <span class="result-chip none">To be entered on the day</span>
+                </div>
+              </td>
+              <td><span class="pts-pending">Grant on the day</span></td>
+              <td style="text-align:center;" class="pdf-cell" data-uid="0845">
+                <span class="pdf-badge none">📄 Not attached</span>
+              </td>
+              <td style="text-align:center;">
+                <button class="btn-input-result" onclick="openModal('Sachiko Yamada', '0845', false)">📝 Enter results</button>
+              </td>
+            </tr>
+            <!-- Row 6: Expected to attend -->
+            <tr data-status="scheduled">
+              <td>
+                <div class="user-cell">
+                  <div class="user-av">👴</div>
+                  <div>
+                    <div class="user-name-cell">Takao Ito</div>
+                    <div class="user-area">East Shingu / ID:1201</div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-size:13px;">Age 77 / Male</td>
+              <td><span class="status-badge scheduled">📋 Expected to attend</span></td>
+              <td>
+                <div class="result-preview">
+                  <span class="result-chip none">To be entered on the day</span>
+                </div>
+              </td>
+              <td><span class="pts-pending">Grant on the day</span></td>
+              <td style="text-align:center;" class="pdf-cell" data-uid="1201">
+                <span class="pdf-badge none">📄 Not attached</span>
+              </td>
+              <td style="text-align:center;">
+                <button class="btn-input-result" onclick="openModal('Takao Ito', '1201', false)">📝 Enter results</button>
+              </td>
+            </tr>
+            <!-- Row 7: Did not attend -->
+            <tr data-status="absent">
+              <td>
+                <div class="user-cell">
+                  <div class="user-av">👵</div>
+                  <div>
+                    <div class="user-name-cell">Miyo Takahashi</div>
+                    <div class="user-area">East Shingu / ID:0761</div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-size:13px;">Age 80 / Female</td>
+              <td><span class="status-badge absent">❌ Did not attend</span></td>
+              <td>
+                <div class="result-preview">
+                  <span class="result-chip none">Not entered (did not attend)</span>
+                </div>
+              </td>
+              <td><span class="pts-pending">—</span></td>
+              <td style="text-align:center;" class="pdf-cell" data-uid="0761">
+                <span class="pdf-badge none">📄 Not attached</span>
+              </td>
+              <td style="text-align:center;">
+                <button class="action-btn" onclick="sendReminder('Miyo Takahashi')">📩 Reminder</button>
+              </td>
+            </tr>
+            <!-- Row 8: Entered -->
+            <tr data-status="entered">
+              <td>
+                <div class="user-cell">
+                  <div class="user-av">👵</div>
+                  <div>
+                    <div class="user-name-cell">Reiko Matsumoto</div>
+                    <div class="user-area">Tanabe City / ID:0633</div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-size:13px;">Age 72 / Female</td>
+              <td><span class="status-badge attended">✅ Participated</span></td>
+              <td>
+                <div class="result-preview">
+                  <span class="result-chip ok">BP 122/78</span>
+                  <span class="result-chip warn">BMI 27.1 ⚠️</span>
+                  <span class="result-chip ok">Glucose 95mg/dL</span>
+                </div>
+              </td>
+              <td><span class="pts-issued">🌟 +50pt</span></td>
+              <td style="text-align:center;" class="pdf-cell" data-uid="0633">
+                <span class="pdf-badge" onclick="openPDFViewer('Reiko Matsumoto', '0633')">📄 View PDF</span>
+              </td>
+              <td style="text-align:center;">
+                <button class="btn-input-result done" onclick="openModal('Reiko Matsumoto', '0633', true)">✏️ Review/edit results</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="pagination">
+          <div class="pg-info">397 total / showing 1–8</div>
+          <div class="pg-btns">
+            <div class="pg-btn">‹</div>
+            <div class="pg-btn active">1</div>
+            <div class="pg-btn">2</div>
+            <div class="pg-btn">3</div>
+            <div class="pg-btn">…</div>
+            <div class="pg-btn">50</div>
+            <div class="pg-btn">›</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /page-participants -->
+
+    <!-- ===== SCHEDULE PAGE ===== -->
+    <div class="page" id="page-schedule">
+      <div class="pm-header">
+        <div>
+          <div class="pm-title">📅 Check-up schedule management</div>
+          <div class="pm-sub">FY2026 Specific Health Check-up & screenings: schedule management, staff assignment, reminder sending</div>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <a href="#" class="btn btn-ghost">📥 Export schedule as CSV</a>
+          <a href="#" class="btn btn-green">+ Register a new check-up event</a>
+        </div>
+      </div>
+
+      <!-- Monthly summary -->
+      <div class="pm-stats-row">
+        <div class="pm-stat">
+          <span class="pm-stat-icon">📅</span>
+          <div>
+            <div><span class="pm-stat-val">4</span><span class="pm-stat-unit">items</span></div>
+            <div class="pm-stat-label">Upcoming scheduled events</div>
+          </div>
+        </div>
+        <div class="pm-stat gold">
+          <span class="pm-stat-icon">👥</span>
+          <div>
+            <div><span class="pm-stat-val">96</span><span class="pm-stat-unit">people</span></div>
+            <div class="pm-stat-label">Total reservations</div>
+          </div>
+        </div>
+        <div class="pm-stat green">
+          <span class="pm-stat-icon">🏥</span>
+          <div>
+            <div><span class="pm-stat-val">300</span><span class="pm-stat-unit">people</span></div>
+            <div class="pm-stat-label">Total capacity</div>
+          </div>
+        </div>
+        <div class="pm-stat">
+          <span class="pm-stat-icon">📩</span>
+          <div>
+            <div><span class="pm-stat-val">42</span><span class="pm-stat-unit">people</span></div>
+            <div class="pm-stat-label">Reminder sent</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Event list table -->
+      <div class="pm-table-card" style="margin-bottom:20px;">
+        <div class="sec-header">
+          <div class="sec-title" style="margin-bottom:0">📋 Check-up event list (June–August 2026)</div>
+          <div style="display:flex; gap:8px;">
+            <select class="filter-select"><option>All statuses</option><option>Open</option><option>Before registration opens</option><option>Completed</option></select>
+          </div>
+        </div>
+        <table class="pm-data-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Location</th>
+              <th>Capacity</th>
+              <th>Reservations</th>
+              <th>Fill rate</th>
+              <th>Status</th>
+              <th>Staff</th>
+              <th>Reminder</th>
+              <th style="text-align:center;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:700; color:var(--gold);">2026/7/12 (Sat)</td>
+              <td>9:00–17:00</td>
+              <td>Shingu Civic Hall</td>
+              <td>80 people</td>
+              <td><strong>42 people</strong></td>
+              <td>
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <div style="flex:1; background:var(--bg); border-radius:99px; height:8px; min-width:60px;"><div style="width:52%; height:100%; border-radius:99px; background:var(--gold);"></div></div>
+                  <span style="font-size:11px; color:var(--gold); font-weight:700;">52%</span>
+                </div>
+              </td>
+              <td><span class="status-badge attended" style="background:var(--gold-light); color:var(--gold);">📋 Open for registration</span></td>
+              <td style="font-size:12px; color:var(--text-mid);">1 doctor · 2 nurses · 2 counselors</td>
+              <td><span class="status-badge attended">📩 sent to 42 people</span></td>
+              <td style="text-align:center;">
+                <div class="action-btns">
+                  <button class="action-btn green">Edit</button>
+                  <button class="action-btn">Details</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td style="font-weight:700;">2026/7/26 (Sat)</td>
+              <td>9:00–16:00</td>
+              <td>Tanabe Central Community Hall</td>
+              <td>60 people</td>
+              <td><strong>31 people</strong></td>
+              <td>
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <div style="flex:1; background:var(--bg); border-radius:99px; height:8px; min-width:60px;"><div style="width:52%; height:100%; border-radius:99px; background:var(--navy-light);"></div></div>
+                  <span style="font-size:11px; color:var(--navy-mid); font-weight:700;">52%</span>
+                </div>
+              </td>
+              <td><span class="status-badge attended" style="background:var(--gold-light); color:var(--gold);">📋 Open for registration</span></td>
+              <td style="font-size:12px; color:var(--text-mid);">1 doctor · 2 nurses · 2 counselors</td>
+              <td><span class="status-badge scheduled">📩 Not sent</span></td>
+              <td style="text-align:center;">
+                <div class="action-btns">
+                  <button class="action-btn green">Edit</button>
+                  <button class="action-btn">Details</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td style="font-weight:700;">2026/8/9 (Sat)</td>
+              <td>9:00–17:00</td>
+              <td>Kumano Cultural Hall</td>
+              <td>80 people</td>
+              <td><strong>18 people</strong></td>
+              <td>
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <div style="flex:1; background:var(--bg); border-radius:99px; height:8px; min-width:60px;"><div style="width:22%; height:100%; border-radius:99px; background:var(--navy-light);"></div></div>
+                  <span style="font-size:11px; color:var(--navy-mid); font-weight:700;">22%</span>
+                </div>
+              </td>
+              <td><span class="status-badge attended" style="background:var(--gold-light); color:var(--gold);">📋 Open for registration</span></td>
+              <td style="font-size:12px; color:var(--text-mid);">1 doctor · 2 nurses · 2 counselors</td>
+              <td><span class="status-badge scheduled">📩 Not sent</span></td>
+              <td style="text-align:center;">
+                <div class="action-btns">
+                  <button class="action-btn green">Edit</button>
+                  <button class="action-btn">Details</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td style="font-weight:700; color:var(--text-light);">2026/8/23 (Sat)</td>
+              <td>9:00–16:00</td>
+              <td>Shingu Civic Hall</td>
+              <td>80 people</td>
+              <td><strong>5 people</strong></td>
+              <td>
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <div style="flex:1; background:var(--bg); border-radius:99px; height:8px; min-width:60px;"><div style="width:6%; height:100%; border-radius:99px; background:var(--text-light);"></div></div>
+                  <span style="font-size:11px; color:var(--text-light); font-weight:700;">6%</span>
+                </div>
+              </td>
+              <td><span class="status-badge active">🔒 Before registration opens</span></td>
+              <td style="font-size:12px; color:var(--text-light);">Assignment TBD</td>
+              <td><span class="status-badge active">📩 Not sent</span></td>
+              <td style="text-align:center;">
+                <div class="action-btns">
+                  <button class="action-btn green">Edit</button>
+                  <button class="action-btn">Details</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Staff assignment & reminder details -->
+      <div class="mid-grid">
+        <div class="card">
+          <div class="sec-title">👩‍⚕️ Staff assignment details — 7/12 Specific Health Check-up</div>
+          <table class="data-table">
+            <thead>
+              <tr><th>Role</th><th>Name</th><th>Affiliation</th><th>Confirmation status</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Doctor (lead)</td><td>Kenta Suzuki</td><td>Shingu Health Center</td><td><span class="status-badge attended">✅ Confirmed</span></td></tr>
+              <tr><td>Nurse</td><td>Miho Tanaka</td><td>Health Promotion Division</td><td><span class="status-badge attended">✅ Confirmed</span></td></tr>
+              <tr><td>Nurse</td><td>Yumi Sasaki</td><td>Regional Coordination Office</td><td><span class="status-badge scheduled">📋 Unconfirmed</span></td></tr>
+              <tr><td>Counselor</td><td>Keiko Yamamoto</td><td>Health Promotion Division</td><td><span class="status-badge attended">✅ Confirmed</span></td></tr>
+              <tr><td>Counselor</td><td>Shuichi Tamura</td><td>Health Promotion Division</td><td><span class="status-badge attended">✅ Confirmed</span></td></tr>
+            </tbody>
+          </table>
+          <div style="margin-top:14px;">
+            <a href="#" class="btn btn-ghost" style="font-size:12px;">+ Add staff</a>
+          </div>
+        </div>
+        <div class="card">
+          <div class="sec-title">📩 Reminder delivery status</div>
+          <div class="notice-list">
+            <div class="notice-item success">
+              <div class="ni-title">✅ Held 7/12 — sent to 42 people</div>
+              <div class="ni-body">Sent: 2026/6/28 9:00 / Open rate: 68%</div>
+            </div>
+            <div class="notice-item info">
+              <div class="ni-title">📋 Held 7/26 — scheduled to send</div>
+              <div class="ni-body">Scheduled to send automatically 7 days before (7/19). Target: 31 people.</div>
+            </div>
+            <div class="notice-item info">
+              <div class="ni-title">📋 Held 8/9 — scheduled to send</div>
+              <div class="ni-body">Scheduled to send automatically 7 days before (8/2). Target: 18 people.</div>
+            </div>
+          </div>
+          <div style="margin-top:14px;">
+            <a href="#" class="btn btn-primary" style="width:100%; justify-content:center; font-size:12px;">📩 Send a reminder now</a>
+          </div>
+        </div>
+      </div>
+    </div><!-- /page-schedule -->
+
+    <!-- ===== POINTS PAGE ===== -->
+    <div class="page" id="page-points">
+      <div class="pm-header">
+        <div>
+          <div class="pm-title">🌟 Point grant management</div>
+          <div class="pm-sub">Bulk & individual point grants to check-up participants: history management, budget management</div>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <a href="#" class="btn btn-ghost">📥 Export point history as CSV</a>
+        </div>
+      </div>
+
+      <!-- Summary cards -->
+      <div class="pm-stats-row" style="grid-template-columns: repeat(4, 1fr);">
+        <div class="pm-stat gold">
+          <span class="pm-stat-icon">🌟</span>
+          <div>
+            <div><span class="pm-stat-val">84,250</span><span class="pm-stat-unit">pt</span></div>
+            <div class="pm-stat-label">Cumulative issued this fiscal year</div>
+          </div>
+        </div>
+        <div class="pm-stat green">
+          <span class="pm-stat-icon">📋</span>
+          <div>
+            <div><span class="pm-stat-val">15,900</span><span class="pm-stat-unit">pt</span></div>
+            <div class="pm-stat-label">Issued this month</div>
+          </div>
+        </div>
+        <div class="pm-stat">
+          <span class="pm-stat-icon">⏰</span>
+          <div>
+            <div><span class="pm-stat-val">23</span><span class="pm-stat-unit">people</span></div>
+            <div class="pm-stat-label">Targets unused for 90 days</div>
+          </div>
+        </div>
+        <div class="pm-stat red">
+          <span class="pm-stat-icon">💰</span>
+          <div>
+            <div><span class="pm-stat-val">15,750</span><span class="pm-stat-unit">pt</span></div>
+            <div class="pm-stat-label">Remaining budget</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Budget gauge -->
+      <div class="card" style="margin-bottom:20px;">
+        <div class="sec-title">💰 Point budget management (FY2026)</div>
+        <div style="display:flex; align-items:center; gap:16px; margin-bottom:10px;">
+          <div style="flex:1;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:12px; color:var(--text-mid);">
+              <span>Used:<strong style="color:var(--navy);">84,250pt</strong></span>
+              <span>Remaining:<strong style="color:var(--green-dark);">15,750pt</strong>　/ Budget:<strong>100,000pt</strong></span>
+            </div>
+            <div style="background:var(--bg); border-radius:99px; height:18px; overflow:hidden; border:1px solid var(--border);">
+              <div style="width:84.25%; height:100%; border-radius:99px; background:linear-gradient(90deg, var(--navy-light), var(--gold)); display:flex; align-items:center; justify-content:flex-end; padding-right:8px;">
+                <span style="font-size:10px; font-weight:700; color:#fff;">84.3%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:12px; color:var(--orange); font-weight:600;">⚠️ 15,750pt remaining until fiscal year-end. Please consider applying for additional budget.</div>
+      </div>
+
+      <div class="mid-grid">
+        <!-- Bulk grant panel -->
+        <div class="card">
+          <div class="sec-title">🌟 Bulk point grant</div>
+          <div class="tab-bar">
+            <div class="tab active" id="tab-bulk">Bulk grant</div>
+            <div class="tab" id="tab-single">Individual grant</div>
+          </div>
+          <!-- Bulk grant form -->
+          <div id="panel-bulk" class="point-issue-form">
+            <div>
+              <div style="font-size:11px; color:var(--text-light); margin-bottom:5px; font-weight:600;">Target check-up event</div>
+              <select class="pif-select">
+                <option>July 12 Specific Health Check-up FY2026 (318 participants)</option>
+                <option>July 26 Specific Health Check-up (31 participants)</option>
+                <option>August 9 Specific Health Check-up (18 participants)</option>
+              </select>
+            </div>
+            <div>
+              <div style="font-size:11px; color:var(--text-light); margin-bottom:5px; font-weight:600;">Points granted</div>
+              <input class="pif-input" type="number" value="50" min="1" max="500">
+            </div>
+            <div>
+              <div style="font-size:11px; color:var(--text-light); margin-bottom:5px; font-weight:600;">Targets</div>
+              <select class="pif-select">
+                <option>All participants (318)</option>
+                <option>Expected participants (42)</option>
+              </select>
+            </div>
+            <div class="divider"></div>
+            <div class="pif-row">
+              <span class="pif-label">Total points granted</span>
+              <span class="pif-val">15,900 pt</span>
+            </div>
+            <div class="pif-row">
+              <span style="font-size:11px; color:var(--text-light);">318 targets × 50pt</span>
+            </div>
+            <a href="#" class="btn btn-green" style="width:100%; justify-content:center; margin-top:4px;" onclick="event.preventDefault(); alert('Bulk-granted 15,900pt to 318 people.')">🌟 Grant to all participants</a>
+          </div>
+          <!-- Individual grant form (hidden by default) -->
+          <div id="panel-single" style="display:none;" class="point-issue-form">
+            <div>
+              <div style="font-size:11px; color:var(--text-light); margin-bottom:5px; font-weight:600;">Search targets</div>
+              <input class="pif-input" type="text" placeholder="🔍 Name or ID number">
+            </div>
+            <div style="padding:12px; background:var(--navy-pale); border-radius:10px; border:1.5px solid var(--border);">
+              <div style="font-size:13px; font-weight:700; color:var(--navy);">Masao Tanaka</div>
+              <div style="font-size:11px; color:var(--text-light); margin-top:2px;">ID:1084 / Currently holds 418pt</div>
+            </div>
+            <div>
+              <div style="font-size:11px; color:var(--text-light); margin-bottom:5px; font-weight:600;">Points to grant / deduct</div>
+              <input class="pif-input" type="number" value="10" placeholder="e.g., +10 or -10">
+            </div>
+            <div>
+              <div style="font-size:11px; color:var(--text-light); margin-bottom:5px; font-weight:600;">Reason / memo</div>
+              <input class="pif-input" type="text" placeholder="e.g., special bonus for check-up attendance">
+            </div>
+            <a href="#" class="btn btn-primary" style="width:100%; justify-content:center;" onclick="event.preventDefault(); alert('Granted +10pt to Masao Tanaka.')">🌟 Execute individual grant</a>
+          </div>
+          <script>
+            document.getElementById('tab-bulk').addEventListener('click', function(){
+              this.classList.add('active'); document.getElementById('tab-single').classList.remove('active');
+              document.getElementById('panel-bulk').style.display=''; document.getElementById('panel-single').style.display='none';
+            });
+            document.getElementById('tab-single').addEventListener('click', function(){
+              this.classList.add('active'); document.getElementById('tab-bulk').classList.remove('active');
+              document.getElementById('panel-single').style.display=''; document.getElementById('panel-bulk').style.display='none';
+            });
+          </script>
+        </div>
+
+        <!-- Grant history -->
+        <div class="card">
+          <div class="sec-title">📋 Recent grant history</div>
+          <table class="data-table">
+            <thead>
+              <tr><th>Date/time</th><th>Target</th><th>Type</th><th>Points</th><th>Person in charge</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-size:12px; white-space:nowrap;">2026/6/26 17:30</td>
+                <td style="font-size:12px;">7/12 check-up<br>318 participants</td>
+                <td><span class="status-badge attended" style="font-size:10px;">Check-up attendance</span></td>
+                <td><span class="pts-issued">🌟 +50pt×318</span></td>
+                <td style="font-size:12px;">Keiko Yamamoto</td>
+              </tr>
+              <tr>
+                <td style="font-size:12px; white-space:nowrap;">2026/6/20 12:00</td>
+                <td style="font-size:12px;">Masao Tanaka</td>
+                <td><span class="status-badge active" style="font-size:10px;">Manual adjustment</span></td>
+                <td><span class="pts-issued">🌟 +10pt</span></td>
+                <td style="font-size:12px;">Keiko Yamamoto</td>
+              </tr>
+              <tr>
+                <td style="font-size:12px; white-space:nowrap;">2026/5/22 18:00</td>
+                <td style="font-size:12px;">5/22 check-up<br>295 participants</td>
+                <td><span class="status-badge attended" style="font-size:10px;">Check-up attendance</span></td>
+                <td><span class="pts-issued">🌟 +50pt×295</span></td>
+                <td style="font-size:12px;">Keiko Yamamoto</td>
+              </tr>
+              <tr>
+                <td style="font-size:12px; white-space:nowrap;">2026/4/18 17:00</td>
+                <td style="font-size:12px;">4/18 check-up<br>310 participants</td>
+                <td><span class="status-badge attended" style="font-size:10px;">Check-up attendance</span></td>
+                <td><span class="pts-issued">🌟 +50pt×310</span></td>
+                <td style="font-size:12px;">Shuichi Tamura</td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="margin-top:14px; padding:12px; background:var(--orange-pale); border-radius:10px; border:1.5px solid #e8c090;">
+            <div style="font-size:12px; font-weight:700; color:var(--orange); margin-bottom:6px;">⏰ List of people with points unused for 90 days</div>
+            <div style="font-size:12px; color:var(--text-mid);">Masao Tanaka (428pt), Miyo Takahashi (190pt), and 21 others</div>
+            <div style="margin-top:8px;">
+              <a href="#" class="btn btn-ghost" style="font-size:11px; padding:5px 12px;" onclick="event.preventDefault(); alert('Sent an expiration-notice message to the 23 targeted people.')">📩 Send expiration-notice message</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /page-points -->
+
+    <!-- ===== STATS PAGE ===== -->
+    <div class="page" id="page-stats">
+      <div class="pm-header">
+        <div>
+          <div class="pm-title">📈 Statistics & analysis report</div>
+          <div class="pm-sub">Vege Ta Walk program: various statistics, health-improvement effects, regional analysis</div>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <a href="#" class="btn btn-ghost" onclick="event.preventDefault(); alert('Download as CSV.')">📥 Download CSV</a>
+          <a href="#" class="btn btn-primary" onclick="event.preventDefault(); alert('Generating PDF report…')">📄 Generate PDF report</a>
+        </div>
+      </div>
+
+      <!-- KPI cards -->
+      <div class="kpi-grid" style="grid-template-columns: repeat(4, 1fr);">
+        <div class="kpi-card accent">
+          <div class="kc-label">Registered count</div>
+          <div><span class="kc-val">397</span><span class="kc-unit">people</span></div>
+          <div class="kc-diff">▲ +12% YoY</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kc-label">Average check-up participation rate</div>
+          <div><span class="kc-val">80.1</span><span class="kc-unit">%</span></div>
+          <div class="kc-diff up">▲ +5.3% YoY</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kc-label">Average steps</div>
+          <div><span class="kc-val">6,240</span><span class="kc-unit">steps/day</span></div>
+          <div class="kc-diff up">▲ +840 steps YoY</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kc-label">Vegetable exchanges (this fiscal year)</div>
+          <div><span class="kc-val">1,842</span><span class="kc-unit">times</span></div>
+          <div class="kc-diff up">▲ +312 times YoY</div>
+        </div>
+      </div>
+
+      <div class="mid-grid" style="margin-bottom:20px;">
+        <!-- Monthly participation bar chart -->
+        <div class="card">
+          <div class="sec-title">📊 Check-up participants by month (FY2026)</div>
+          <div class="bar-chart">
+            <div class="bc-row">
+              <div class="bc-label">January</div>
+              <div class="bc-bar-wrap"><div class="bc-bar" style="width:88%;"></div></div>
+              <div class="bc-val">280 people</div>
+            </div>
+            <div class="bc-row">
+              <div class="bc-label">February</div>
+              <div class="bc-bar-wrap"><div class="bc-bar" style="width:83%;"></div></div>
+              <div class="bc-val">265 people</div>
+            </div>
+            <div class="bc-row">
+              <div class="bc-label">March</div>
+              <div class="bc-bar-wrap"><div class="bc-bar" style="width:91%;"></div></div>
+              <div class="bc-val">290 people</div>
+            </div>
+            <div class="bc-row">
+              <div class="bc-label">April</div>
+              <div class="bc-bar-wrap"><div class="bc-bar green" style="width:97%;"></div></div>
+              <div class="bc-val">310 people</div>
+            </div>
+            <div class="bc-row">
+              <div class="bc-label">May</div>
+              <div class="bc-bar-wrap"><div class="bc-bar green" style="width:93%;"></div></div>
+              <div class="bc-val">295 people</div>
+            </div>
+            <div class="bc-row">
+              <div class="bc-label">June</div>
+              <div class="bc-bar-wrap"><div class="bc-bar green" style="width:100%;"></div></div>
+              <div class="bc-val">318 people</div>
+            </div>
+          </div>
+          <div style="margin-top:10px; font-size:11px; color:var(--text-light);">※ June achieved the highest participation this fiscal year</div>
+        </div>
+
+        <!-- Age & gender breakdown -->
+        <div style="display:flex; flex-direction:column; gap:18px;">
+          <div class="card">
+            <div class="sec-title">👥 Share by age group</div>
+            <div class="bar-chart">
+              <div class="bc-row">
+                <div class="bc-label">60s</div>
+                <div class="bc-bar-wrap"><div class="bc-bar" style="width:28%;"></div></div>
+                <div class="bc-val">28%</div>
+              </div>
+              <div class="bc-row">
+                <div class="bc-label">70s</div>
+                <div class="bc-bar-wrap"><div class="bc-bar green" style="width:45%;"></div></div>
+                <div class="bc-val">45%</div>
+              </div>
+              <div class="bc-row">
+                <div class="bc-label">80s and older</div>
+                <div class="bc-bar-wrap"><div class="bc-bar" style="width:27%; background:linear-gradient(90deg,#c89a6a,#a07040);"></div></div>
+                <div class="bc-val">27%</div>
+              </div>
+            </div>
+            <div style="margin-top:10px; display:flex; gap:10px;">
+              <div style="flex:1; text-align:center; padding:8px; background:var(--navy-pale); border-radius:8px; font-size:12px;">
+                <div style="font-weight:700; color:var(--navy-mid);">42%</div>
+                <div style="color:var(--text-light);">Male</div>
+              </div>
+              <div style="flex:1; text-align:center; padding:8px; background:var(--orange-pale); border-radius:8px; font-size:12px;">
+                <div style="font-weight:700; color:var(--orange);">58%</div>
+                <div style="color:var(--text-light);">Female</div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="sec-title">💪 Health improvement metrics</div>
+            <div class="bar-chart">
+              <div class="bc-row">
+                <div class="bc-label" style="min-width:90px;">People with improved BP</div>
+                <div class="bc-bar-wrap"><div class="bc-bar green" style="width:23%;"></div></div>
+                <div class="bc-val">23%</div>
+              </div>
+              <div class="bc-row">
+                <div class="bc-label" style="min-width:90px;">People with improved BMI</div>
+                <div class="bc-bar-wrap"><div class="bc-bar green" style="width:18%;"></div></div>
+                <div class="bc-val">18%</div>
+              </div>
+              <div class="bc-row">
+                <div class="bc-label" style="min-width:90px;">People with increased steps</div>
+                <div class="bc-bar-wrap"><div class="bc-bar green" style="width:61%;"></div></div>
+                <div class="bc-val">61%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Participation-rate-by-region table -->
+      <div class="card">
+        <div class="sec-title">📍 Participation rate by district (latest check-up)</div>
+        <table class="data-table">
+          <thead>
+            <tr><th>District</th><th>Registered count</th><th>Participants</th><th>Participation rate</th><th>vs last month</th><th>Achievement status</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:600;">North Shingu</td><td>112 people</td><td>100 people</td>
+              <td><div style="display:flex; align-items:center; gap:6px;"><div style="flex:1; background:var(--bg); border-radius:99px; height:8px; min-width:80px;"><div style="width:89%; height:100%; border-radius:99px; background:var(--green-mid);"></div></div><strong style="color:var(--green-dark);">89%</strong></div></td>
+              <td class="kc-diff up">▲ +3%</td>
+              <td><span class="status-badge attended">✅ Goal achieved</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">South Shingu</td><td>98 people</td><td>82 people</td>
+              <td><div style="display:flex; align-items:center; gap:6px;"><div style="flex:1; background:var(--bg); border-radius:99px; height:8px; min-width:80px;"><div style="width:84%; height:100%; border-radius:99px; background:var(--green-mid);"></div></div><strong style="color:var(--green-dark);">84%</strong></div></td>
+              <td class="kc-diff up">▲ +1%</td>
+              <td><span class="status-badge attended">✅ Goal achieved</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">East Shingu</td><td>74 people</td><td>51 people</td>
+              <td><div style="display:flex; align-items:center; gap:6px;"><div style="flex:1; background:var(--bg); border-radius:99px; height:8px; min-width:80px;"><div style="width:69%; height:100%; border-radius:99px; background:var(--gold);"></div></div><strong style="color:var(--gold);">69%</strong></div></td>
+              <td class="kc-diff down">▼ -2%</td>
+              <td><span class="status-badge scheduled">📋 Caution</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">Tanabe City</td><td>71 people</td><td>54 people</td>
+              <td><div style="display:flex; align-items:center; gap:6px;"><div style="flex:1; background:var(--bg); border-radius:99px; height:8px; min-width:80px;"><div style="width:76%; height:100%; border-radius:99px; background:var(--navy-light);"></div></div><strong style="color:var(--navy-mid);">76%</strong></div></td>
+              <td class="kc-diff up">▲ +4%</td>
+              <td><span class="status-badge attended">✅ Goal achieved</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">Kumano City</td><td>42 people</td><td>31 people</td>
+              <td><div style="display:flex; align-items:center; gap:6px;"><div style="flex:1; background:var(--bg); border-radius:99px; height:8px; min-width:80px;"><div style="width:71%; height:100%; border-radius:99px; background:var(--navy-light);"></div></div><strong style="color:var(--navy-mid);">74%</strong></div></td>
+              <td class="kc-diff down">▼ -1%</td>
+              <td><span class="status-badge scheduled">📋 Caution</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!-- /page-stats -->
+
+    <!-- ===== FARMERS PAGE ===== -->
+    <div class="page" id="page-farmers">
+      <div class="pm-header">
+        <div>
+          <div class="pm-title">🥕 Farm coordination management</div>
+          <div class="pm-sub">Manage farms in the vegetable-exchange program: inventory checks, exchange-results tallying</div>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <a href="#" class="btn btn-ghost">📥 Export integration data as CSV</a>
+          <a href="#" class="btn btn-green">+ Register a new farm</a>
+        </div>
+      </div>
+
+      <!-- Summary -->
+      <div class="pm-stats-row">
+        <div class="pm-stat gold">
+          <span class="pm-stat-icon">🥕</span>
+          <div>
+            <div><span class="pm-stat-val">4</span><span class="pm-stat-unit">Farm</span></div>
+            <div class="pm-stat-label">Registered farms</div>
+          </div>
+        </div>
+        <div class="pm-stat green">
+          <span class="pm-stat-icon">🔄</span>
+          <div>
+            <div><span class="pm-stat-val">284</span><span class="pm-stat-unit">times</span></div>
+            <div class="pm-stat-label">Exchanges this month</div>
+          </div>
+        </div>
+        <div class="pm-stat">
+          <span class="pm-stat-icon">♻️</span>
+          <div>
+            <div><span class="pm-stat-val">856</span><span class="pm-stat-unit">kg</span></div>
+            <div class="pm-stat-label">Food loss reduced (this month)</div>
+          </div>
+        </div>
+        <div class="pm-stat red">
+          <span class="pm-stat-icon">⚠️</span>
+          <div>
+            <div><span class="pm-stat-val">2</span><span class="pm-stat-unit">Farm</span></div>
+            <div class="pm-stat-label">Low stock · paused</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Farm list table -->
+      <div class="pm-table-card" style="margin-bottom:20px;">
+        <div class="sec-title">🌾 Registered farm list</div>
+        <table class="pm-data-table">
+          <thead>
+            <tr>
+              <th>Farm name</th>
+              <th>Region</th>
+              <th>Vegetables handled</th>
+              <th>Inventory status</th>
+              <th>Exchanges this month</th>
+              <th>Status</th>
+              <th style="text-align:center;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="user-cell">
+                  <div class="user-av">🌿</div>
+                  <div>
+                    <div class="user-name-cell">Sato Farm</div>
+                    <div class="user-area">Representative: Ichiro Sato</div>
+                  </div>
+                </div>
+              </td>
+              <td>Shingu City</td>
+              <td style="font-size:12px;">Eggplant, cucumber, green pepper</td>
+              <td><span class="status-badge attended">✅ In stock</span></td>
+              <td style="font-weight:700; color:var(--navy);">124 times</td>
+              <td><span class="status-badge attended">🤝 Coordinating</span></td>
+              <td style="text-align:center;">
+                <div class="action-btns"><button class="action-btn green">Edit</button><button class="action-btn">Details</button></div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="user-cell">
+                  <div class="user-av">🌱</div>
+                  <div>
+                    <div class="user-name-cell">Nakamura Farm</div>
+                    <div class="user-area">Representative: Kenji Nakamura</div>
+                  </div>
+                </div>
+              </td>
+              <td>Tanabe City</td>
+              <td style="font-size:12px;">Zucchini, tomato</td>
+              <td><span class="status-badge scheduled">⚠️ Low stock</span></td>
+              <td style="font-weight:700; color:var(--navy);">98 times</td>
+              <td><span class="status-badge attended">🤝 Coordinating</span></td>
+              <td style="text-align:center;">
+                <div class="action-btns"><button class="action-btn green">Edit</button><button class="action-btn">Details</button></div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="user-cell">
+                  <div class="user-av">🌾</div>
+                  <div>
+                    <div class="user-name-cell">Yamada Natural Farm</div>
+                    <div class="user-area">Representative: Masao Yamada</div>
+                  </div>
+                </div>
+              </td>
+              <td>Kumano City</td>
+              <td style="font-size:12px;">Corn, pumpkin</td>
+              <td><span class="status-badge attended">✅ In stock</span></td>
+              <td style="font-weight:700; color:var(--navy);">62 times</td>
+              <td><span class="status-badge attended">🤝 Coordinating</span></td>
+              <td style="text-align:center;">
+                <div class="action-btns"><button class="action-btn green">Edit</button><button class="action-btn">Details</button></div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="user-cell">
+                  <div class="user-av">🏚️</div>
+                  <div>
+                    <div class="user-name-cell">Takahashi Farm</div>
+                    <div class="user-area">Representative: Katsunori Takahashi</div>
+                  </div>
+                </div>
+              </td>
+              <td>Shingu City</td>
+              <td style="font-size:12px;">Daikon, Chinese cabbage</td>
+              <td><span class="status-badge absent">❌ Out of stock</span></td>
+              <td style="font-weight:700; color:var(--text-light);">0 times</td>
+              <td><span class="status-badge absent">⏸ Pause</span></td>
+              <td style="text-align:center;">
+                <div class="action-btns"><button class="action-btn">Reactivation request</button><button class="action-btn">Details</button></div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mid-grid">
+        <div class="card">
+          <div class="sec-title">📦 Vegetable inventory summary</div>
+          <div class="bar-chart">
+            <div class="bc-row">
+              <div class="bc-label" style="min-width:100px;">Eggplant</div>
+              <div class="bc-bar-wrap"><div class="bc-bar green" style="width:80%;"></div></div>
+              <div class="bc-val">Stock: plenty</div>
+            </div>
+            <div class="bc-row">
+              <div class="bc-label" style="min-width:100px;">Cucumber</div>
+              <div class="bc-bar-wrap"><div class="bc-bar green" style="width:65%;"></div></div>
+              <div class="bc-val">Stock: plenty</div>
+            </div>
+            <div class="bc-row">
+              <div class="bc-label" style="min-width:100px;">Zucchini</div>
+              <div class="bc-bar-wrap"><div class="bc-bar" style="width:20%; background:var(--gold);"></div></div>
+              <div class="bc-val" style="color:var(--gold);">Low stock</div>
+            </div>
+            <div class="bc-row">
+              <div class="bc-label" style="min-width:100px;">Tomato</div>
+              <div class="bc-bar-wrap"><div class="bc-bar" style="width:15%; background:var(--gold);"></div></div>
+              <div class="bc-val" style="color:var(--gold);">Low stock</div>
+            </div>
+            <div class="bc-row">
+              <div class="bc-label" style="min-width:100px;">Corn</div>
+              <div class="bc-bar-wrap"><div class="bc-bar green" style="width:90%;"></div></div>
+              <div class="bc-val">Stock: plenty</div>
+            </div>
+            <div class="bc-row">
+              <div class="bc-label" style="min-width:100px;">Daikon · Chinese cabbage</div>
+              <div class="bc-bar-wrap"><div class="bc-bar" style="width:2%; background:var(--red);"></div></div>
+              <div class="bc-val" style="color:var(--red);">Out of stock</div>
+            </div>
+          </div>
+          <div style="margin-top:12px; font-size:11px; color:var(--text-light);">※ Handover every Saturday 9:00–12:00 at Shingu Civic Hall</div>
+        </div>
+        <div class="card">
+          <div class="sec-title">📅 Vegetable-exchange handover schedule</div>
+          <div class="schedule-list">
+            <div class="sched-item upcoming">
+              <div class="sched-date-box">
+                <div class="sched-month">July</div>
+                <div class="sched-day">12</div>
+              </div>
+              <div class="sched-divider"></div>
+              <div class="sched-info">
+                <div class="sched-name">Vegetable exchange event</div>
+                <div class="sched-meta">Shingu Civic Hall / 9:00–12:00</div>
+              </div>
+              <div class="sched-stat">
+                <div class="sched-count">3</div>
+                <div class="sched-label">Farms expected to participate</div>
+              </div>
+            </div>
+            <div class="sched-item">
+              <div class="sched-date-box">
+                <div class="sched-month">July</div>
+                <div class="sched-day">19</div>
+              </div>
+              <div class="sched-divider"></div>
+              <div class="sched-info">
+                <div class="sched-name">Vegetable exchange event</div>
+                <div class="sched-meta">Shingu Civic Hall / 9:00–12:00</div>
+              </div>
+              <div class="sched-stat">
+                <div class="sched-count">3</div>
+                <div class="sched-label">Farms expected to participate</div>
+              </div>
+            </div>
+            <div class="sched-item">
+              <div class="sched-date-box">
+                <div class="sched-month">July</div>
+                <div class="sched-day">26</div>
+              </div>
+              <div class="sched-divider"></div>
+              <div class="sched-info">
+                <div class="sched-name">Vegetable exchange event</div>
+                <div class="sched-meta">Tanabe Central Community Hall / 9:00–12:00</div>
+              </div>
+              <div class="sched-stat">
+                <div class="sched-count">2</div>
+                <div class="sched-label">Farms expected to participate</div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:12px; padding:10px 12px; background:var(--green-pale); border-radius:8px; border:1px solid var(--green-light); font-size:12px; color:var(--green-dark);">
+            🌿 Held regularly every Saturday. Farmers, please confirm inventory in the system by 17:00 the day before.
+          </div>
+        </div>
+      </div>
+    </div><!-- /page-farmers -->
+
+    <!-- ===== NOTICES PAGE ===== -->
+    <div class="page" id="page-notices">
+      <div class="pm-header">
+        <div>
+          <div class="pm-title">💬 Announcement & message delivery</div>
+          <div class="pm-sub">Create announcements for participants: bulk delivery, delivery history, automatic reminder settings</div>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <a href="#" class="btn btn-ghost">📝 Drafts (2)</a>
+        </div>
+      </div>
+
+      <div class="mid-grid">
+        <!-- Create new announcement -->
+        <div class="card">
+          <div class="sec-title">✏️ Create a new announcement</div>
+          <div style="display:flex; flex-direction:column; gap:12px;">
+            <div class="form-group">
+              <label class="form-label">Title</label>
+              <input class="form-input" type="text" placeholder="e.g., Notice of July check-up schedule">
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+              <div class="form-group">
+                <label class="form-label">Send targets</label>
+                <select class="form-select">
+                  <option>Everyone (397)</option>
+                  <option>By region (North Shingu)</option>
+                  <option>By region (Tanabe City)</option>
+                  <option>By region (Kumano City)</option>
+                  <option>Specify individual</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Send channel</label>
+                <select class="form-select">
+                  <option>In-app notification + LINE</option>
+                  <option>In-app notification only</option>
+                  <option>LINE only</option>
+                  <option>SMS</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Message body</label>
+              <textarea class="form-textarea" rows="5" placeholder="e.g., Thank you as always for taking part in Vege Ta Walk. Regarding the Specific Health Check-up on July 12 (Sat)…"></textarea>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+              <div class="form-group">
+                <label class="form-label">Send timing</label>
+                <select class="form-select" id="notice-timing">
+                  <option value="now">Send now</option>
+                  <option value="schedule">Specify date & time</option>
+                </select>
+              </div>
+              <div class="form-group" id="notice-datetime-group" style="display:none;">
+                <label class="form-label">Sent date/time</label>
+                <input class="form-input" type="datetime-local" value="2026-07-05T09:00">
+              </div>
+            </div>
+            <script>
+              document.getElementById('notice-timing').addEventListener('change', function(){
+                document.getElementById('notice-datetime-group').style.display = this.value === 'schedule' ? '' : 'none';
+              });
+            </script>
+            <div style="display:flex; gap:8px; margin-top:4px;">
+              <a href="#" class="btn btn-ghost" style="flex:1; justify-content:center;" onclick="event.preventDefault(); alert('Saved as a draft.')">💾 Save draft</a>
+              <a href="#" class="btn btn-green" style="flex:2; justify-content:center;" onclick="event.preventDefault(); alert('Sent an announcement to 397 people.')">📤 Send</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Side panel -->
+        <div style="display:flex; flex-direction:column; gap:18px;">
+          <!-- Automatic reminder settings -->
+          <div class="card">
+            <div class="sec-title">⚙️ Automatic reminder settings</div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 12px; background:var(--green-pale); border-radius:8px; border:1px solid var(--green-light);">
+                <div>
+                  <div style="font-size:13px; font-weight:700; color:var(--green-dark);">Check-up 3-days-prior reminder</div>
+                  <div style="font-size:11px; color:var(--text-light);">Sent automatically at 9:00, 3 days before the event</div>
+                </div>
+                <span style="background:var(--green-mid); color:#fff; font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px;">ON</span>
+              </div>
+              <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 12px; background:var(--green-pale); border-radius:8px; border:1px solid var(--green-light);">
+                <div>
+                  <div style="font-size:13px; font-weight:700; color:var(--green-dark);">Check-up morning-of reminder</div>
+                  <div style="font-size:11px; color:var(--text-light);">Sent automatically at 7:30 on the event day</div>
+                </div>
+                <span style="background:var(--green-mid); color:#fff; font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px;">ON</span>
+              </div>
+              <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 12px; background:var(--bg); border-radius:8px; border:1px solid var(--border);">
+                <div>
+                  <div style="font-size:13px; font-weight:700; color:var(--text-mid);">Notify 7 days before point expiration</div>
+                  <div style="font-size:11px; color:var(--text-light);">Individual notice 7 days before expiration</div>
+                </div>
+                <span style="background:var(--text-light); color:#fff; font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px;">OFF</span>
+              </div>
+            </div>
+          </div>
+          <!-- Draft -->
+          <div class="card">
+            <div class="sec-title">📝 Saved drafts (2)</div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <div style="padding:10px 12px; background:var(--bg); border-radius:8px; border:1px solid var(--border); cursor:pointer;">
+                <div style="font-size:13px; font-weight:700; color:var(--navy);">August check-up notice</div>
+                <div style="font-size:11px; color:var(--text-light); margin-top:2px;">Saved: 2026/6/25 / Target: everyone</div>
+              </div>
+              <div style="padding:10px 12px; background:var(--bg); border-radius:8px; border:1px solid var(--border); cursor:pointer;">
+                <div style="font-size:13px; font-weight:700; color:var(--navy);">Introduction to the vegetable-exchange program</div>
+                <div style="font-size:11px; color:var(--text-light); margin-top:2px;">Saved: 2026/6/20 / Target: non-participants</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Delivery history -->
+      <div class="pm-table-card" style="margin-top:20px;">
+        <div class="sec-title">📋 Delivery history (latest 5)</div>
+        <table class="pm-data-table">
+          <thead>
+            <tr>
+              <th>Sent date/time</th>
+              <th>Title</th>
+              <th>Send targets</th>
+              <th>Channel</th>
+              <th>Open rate</th>
+              <th style="text-align:center;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-size:12px; white-space:nowrap;">6/28 9:00</td>
+              <td style="font-weight:600;">July check-up notice</td>
+              <td style="font-size:12px;">Everyone, 397 people</td>
+              <td><span class="status-badge attended" style="font-size:10px;">App + LINE</span></td>
+              <td>
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <div style="width:60px; background:var(--bg); border-radius:99px; height:6px;"><div style="width:68%; height:100%; border-radius:99px; background:var(--green-mid);"></div></div>
+                  <strong style="font-size:12px; color:var(--green-dark);">68%</strong>
+                </div>
+              </td>
+              <td style="text-align:center;"><div class="action-btns"><button class="action-btn">Details</button><button class="action-btn green">Resend</button></div></td>
+            </tr>
+            <tr>
+              <td style="font-size:12px; white-space:nowrap;">6/20 12:00</td>
+              <td style="font-weight:600;">Notice of point grant</td>
+              <td style="font-size:12px;">318 participants</td>
+              <td><span class="status-badge active" style="font-size:10px;">App only</span></td>
+              <td>
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <div style="width:60px; background:var(--bg); border-radius:99px; height:6px;"><div style="width:72%; height:100%; border-radius:99px; background:var(--green-mid);"></div></div>
+                  <strong style="font-size:12px; color:var(--green-dark);">72%</strong>
+                </div>
+              </td>
+              <td style="text-align:center;"><div class="action-btns"><button class="action-btn">Details</button></div></td>
+            </tr>
+            <tr>
+              <td style="font-size:12px; white-space:nowrap;">6/15 10:00</td>
+              <td style="font-weight:600;">Notice of vegetable-exchange event</td>
+              <td style="font-size:12px;">Everyone, 397 people</td>
+              <td><span class="status-badge attended" style="font-size:10px;">App + LINE</span></td>
+              <td>
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <div style="width:60px; background:var(--bg); border-radius:99px; height:6px;"><div style="width:65%; height:100%; border-radius:99px; background:var(--navy-light);"></div></div>
+                  <strong style="font-size:12px; color:var(--navy-mid);">65%</strong>
+                </div>
+              </td>
+              <td style="text-align:center;"><div class="action-btns"><button class="action-btn">Details</button></div></td>
+            </tr>
+            <tr>
+              <td style="font-size:12px; white-space:nowrap;">6/5 8:30</td>
+              <td style="font-weight:600;">June check-up 3-days-prior reminder</td>
+              <td style="font-size:12px;">75 expected</td>
+              <td><span class="status-badge attended" style="font-size:10px;">App + LINE</span></td>
+              <td>
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <div style="width:60px; background:var(--bg); border-radius:99px; height:6px;"><div style="width:81%; height:100%; border-radius:99px; background:var(--green-mid);"></div></div>
+                  <strong style="font-size:12px; color:var(--green-dark);">81%</strong>
+                </div>
+              </td>
+              <td style="text-align:center;"><div class="action-btns"><button class="action-btn">Details</button></div></td>
+            </tr>
+            <tr>
+              <td style="font-size:12px; white-space:nowrap;">5/22 18:00</td>
+              <td style="font-weight:600;">May check-up point grant completed</td>
+              <td style="font-size:12px;">295 participants</td>
+              <td><span class="status-badge active" style="font-size:10px;">App only</span></td>
+              <td>
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <div style="width:60px; background:var(--bg); border-radius:99px; height:6px;"><div style="width:70%; height:100%; border-radius:99px; background:var(--navy-light);"></div></div>
+                  <strong style="font-size:12px; color:var(--navy-mid);">70%</strong>
+                </div>
+              </td>
+              <td style="text-align:center;"><div class="action-btns"><button class="action-btn">Details</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!-- /page-notices -->
+
+    <!-- ===== SETTINGS PAGE ===== -->
+    <div class="page" id="page-settings">
+      <div class="pm-header">
+        <div>
+          <div class="pm-title">⚙️ System settings</div>
+          <div class="pm-sub">Vege Ta Walk Administration Portal: basic settings, notifications, data management</div>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <a href="#" class="btn btn-green" onclick="event.preventDefault(); alert('Settings saved.')">💾 Save settings</a>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+        <!-- Basic settings -->
+        <div class="card">
+          <div class="sec-title">🏛 Basic settings</div>
+          <div style="display:flex; flex-direction:column; gap:14px;">
+            <div class="form-group">
+              <label class="form-label">System name</label>
+              <input class="form-input" type="text" value="Vege Ta Walk Administration Portal">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Operating municipality</label>
+              <input class="form-input" type="text" value="Nagano Pref. — Shingu / Tanabe / Kumano">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Department in charge</label>
+              <input class="form-input" type="text" value="Health Promotion Division">
+            </div>
+            <div class="form-group">
+              <label class="form-label">System administrator email address</label>
+              <input class="form-input" type="email" value="kenkou@nagano.example.jp">
+            </div>
+          </div>
+        </div>
+
+        <!-- Point settings -->
+        <div class="card">
+          <div class="sec-title">🌟 Point rule settings</div>
+          <div style="display:flex; flex-direction:column; gap:14px;">
+            <div class="form-group">
+              <label class="form-label">Point validity period (days)</label>
+              <input class="form-input" type="number" value="90">
+              <div class="form-hint">Expires a specified number of days after the last earning date</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Points per check-up attendance (pt)</label>
+              <input class="form-input" type="number" value="50">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Points per 1,000 steps walked (pt)</label>
+              <input class="form-input" type="number" value="1">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Points per vegetable exchange (pt)</label>
+              <input class="form-input" type="number" value="10">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Annual point budget (pt)</label>
+              <input class="form-input" type="number" value="100000">
+            </div>
+          </div>
+        </div>
+
+        <!-- Notification settings -->
+        <div class="card">
+          <div class="sec-title">🔔 Notification settings</div>
+          <div style="display:flex; flex-direction:column; gap:12px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:12px; background:var(--green-pale); border-radius:8px; border:1px solid var(--green-light);">
+              <div>
+                <div style="font-size:13px; font-weight:700; color:var(--green-dark);">Email notification</div>
+                <div style="font-size:11px; color:var(--text-light);">Send email to the person in charge before a check-up and when points are granted</div>
+              </div>
+              <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                <input type="checkbox" checked> <span style="font-size:12px; font-weight:700; color:var(--green-dark);">ON</span>
+              </label>
+            </div>
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:12px; background:var(--green-pale); border-radius:8px; border:1px solid var(--green-light);">
+              <div>
+                <div style="font-size:13px; font-weight:700; color:var(--green-dark);">LINE integration</div>
+                <div style="font-size:11px; color:var(--text-light);">Deliver announcements from the official LINE account</div>
+              </div>
+              <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                <input type="checkbox" checked> <span style="font-size:12px; font-weight:700; color:var(--green-dark);">ON</span>
+              </label>
+            </div>
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:12px; background:var(--bg); border-radius:8px; border:1px solid var(--border);">
+              <div>
+                <div style="font-size:13px; font-weight:700; color:var(--text-mid);">SMS delivery</div>
+                <div style="font-size:11px; color:var(--text-light);">SMS notifications for emergencies, etc. (separate contract required)</div>
+              </div>
+              <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                <input type="checkbox"> <span style="font-size:12px; color:var(--text-light);">OFF</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Data management & system info -->
+        <div class="card">
+          <div class="sec-title">🗄 Data management / System info</div>
+          <div style="display:flex; flex-direction:column; gap:12px;">
+            <div style="padding:12px; background:var(--navy-pale); border-radius:8px; border:1px solid var(--border);">
+              <div style="font-size:12px; font-weight:700; color:var(--navy); margin-bottom:6px;">🔄 Backup</div>
+              <div style="font-size:12px; color:var(--text-mid);">Automatic backup running daily at 2:00</div>
+              <div style="font-size:11px; color:var(--text-light); margin-top:3px;">Last backup: 2026/6/28 2:00 ✅</div>
+              <div style="margin-top:8px;"><a href="#" class="btn btn-ghost" style="font-size:11px; padding:5px 12px;" onclick="event.preventDefault(); alert('Started a manual backup.')">Back up now</a></div>
+            </div>
+            <div style="padding:12px; background:var(--bg); border-radius:8px; border:1px solid var(--border);">
+              <div style="font-size:12px; font-weight:700; color:var(--navy); margin-bottom:6px;">📋 Data retention period</div>
+              <div style="font-size:12px; color:var(--text-mid);">Check-up records: retained 5 years / Logs: retained 1 year</div>
+            </div>
+            <div style="padding:12px; background:var(--bg); border-radius:8px; border:1px solid var(--border);">
+              <div style="font-size:12px; font-weight:700; color:var(--navy); margin-bottom:8px;">ℹ️ System info</div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; font-size:12px; color:var(--text-mid);">
+                <div>Version</div><div style="font-weight:600; color:var(--navy);">2.3.1</div>
+                <div>Last updated</div><div style="font-weight:600; color:var(--navy);">2026/6/25</div>
+                <div>DB size</div><div style="font-weight:600; color:var(--navy);">4.2 GB</div>
+                <div>Uptime</div><div style="font-weight:600; color:var(--green-dark);">247 days ✅</div>
+              </div>
+            </div>
+            <div style="padding:12px; background:var(--red-pale); border-radius:8px; border:1.5px solid #e8aaaa; display:flex; align-items:center; justify-content:space-between;">
+              <div>
+                <div style="font-size:13px; font-weight:700; color:var(--red);">🔧 Maintenance mode</div>
+                <div style="font-size:11px; color:var(--text-light);">When turned ON, users will be unable to access</div>
+              </div>
+              <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                <input type="checkbox"> <span style="font-size:12px; font-weight:700; color:var(--text-light);">Currently OFF</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /page-settings -->
+
+    <!-- ===== ACCESS PAGE ===== -->
+    <div class="page" id="page-access">
+      <div class="pm-header">
+        <div>
+          <div class="pm-title">🔒 Access permission management</div>
+          <div class="pm-sub">Staff accounts, roles, permission matrix, login audit log</div>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <a href="#" class="btn btn-ghost">📥 Export account list as CSV</a>
+          <a href="#" class="btn btn-green" onclick="event.preventDefault(); alert('Opens the new-account registration form.')">+ Add a new account</a>
+        </div>
+      </div>
+
+      <!-- Staff account list -->
+      <div class="pm-table-card" style="margin-bottom:20px;">
+        <div class="sec-header">
+          <div class="sec-title" style="margin-bottom:0;">👥 Staff account list</div>
+          <div style="display:flex; gap:8px;">
+            <select class="filter-select"><option>All roles</option><option>Administrator</option><option>Person in charge</option><option>Viewer</option></select>
+            <select class="filter-select"><option>All statuses</option><option>Active</option><option>On leave</option></select>
+          </div>
+        </div>
+        <table class="pm-data-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Department</th>
+              <th>Role</th>
+              <th>Last login</th>
+              <th>Status</th>
+              <th style="text-align:center;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="user-cell">
+                  <div class="user-av">👩‍💼</div>
+                  <div>
+                    <div class="user-name-cell">Keiko Yamamoto</div>
+                    <div class="user-area">yamamoto@nagano.example.jp</div>
+                  </div>
+                </div>
+              </td>
+              <td>Health Promotion Division</td>
+              <td><span style="background:var(--navy); color:#fff; font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px;">🔑 Administrator</span></td>
+              <td style="font-size:12px;">2026/6/28 14:30</td>
+              <td><span class="status-badge attended">● Active</span></td>
+              <td style="text-align:center;">
+                <div class="action-btns"><button class="action-btn">Edit</button><button class="action-btn">Log</button></div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="user-cell">
+                  <div class="user-av">👨‍💼</div>
+                  <div>
+                    <div class="user-name-cell">Shuichi Tamura</div>
+                    <div class="user-area">tamura@nagano.example.jp</div>
+                  </div>
+                </div>
+              </td>
+              <td>Health Promotion Division</td>
+              <td><span style="background:var(--navy-light); color:#fff; font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px;">📋 Person in charge</span></td>
+              <td style="font-size:12px;">2026/6/27 9:15</td>
+              <td><span class="status-badge attended">● Active</span></td>
+              <td style="text-align:center;">
+                <div class="action-btns"><button class="action-btn">Edit</button><button class="action-btn">Log</button></div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="user-cell">
+                  <div class="user-av">👩‍💼</div>
+                  <div>
+                    <div class="user-name-cell">Misaki Suzuki</div>
+                    <div class="user-area">suzuki@nagano.example.jp</div>
+                  </div>
+                </div>
+              </td>
+              <td>Regional Coordination Office</td>
+              <td><span style="background:var(--navy-light); color:#fff; font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px;">📋 Person in charge</span></td>
+              <td style="font-size:12px;">2026/6/26 16:42</td>
+              <td><span class="status-badge attended">● Active</span></td>
+              <td style="text-align:center;">
+                <div class="action-btns"><button class="action-btn">Edit</button><button class="action-btn">Log</button></div>
+              </td>
+            </tr>
+            <tr style="opacity:0.7;">
+              <td>
+                <div class="user-cell">
+                  <div class="user-av">👨‍💼</div>
+                  <div>
+                    <div class="user-name-cell">Hiroshi Sasaki</div>
+                    <div class="user-area">sasaki@nagano.example.jp</div>
+                  </div>
+                </div>
+              </td>
+              <td>Health Promotion Division</td>
+              <td><span style="background:var(--text-light); color:#fff; font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px;">👁 Viewer</span></td>
+              <td style="font-size:12px; color:var(--text-light);">2026/6/20 11:00</td>
+              <td><span class="status-badge absent">⏸ On leave</span></td>
+              <td style="text-align:center;">
+                <div class="action-btns"><button class="action-btn">Edit</button><button class="action-btn">Log</button></div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mid-grid">
+        <!-- Permission matrix -->
+        <div class="card">
+          <div class="sec-title">🔐 Permission matrix by role</div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Feature</th>
+                <th style="text-align:center;">🔑 Administrator</th>
+                <th style="text-align:center;">📋 Person in charge</th>
+                <th style="text-align:center;">👁 Viewer</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>View data</td>
+                <td style="text-align:center; color:var(--green-dark); font-weight:700; font-size:15px;">✓</td>
+                <td style="text-align:center; color:var(--green-dark); font-weight:700; font-size:15px;">✓</td>
+                <td style="text-align:center; color:var(--green-dark); font-weight:700; font-size:15px;">✓</td>
+              </tr>
+              <tr>
+                <td>Check-up result entry</td>
+                <td style="text-align:center; color:var(--green-dark); font-weight:700; font-size:15px;">✓</td>
+                <td style="text-align:center; color:var(--green-dark); font-weight:700; font-size:15px;">✓</td>
+                <td style="text-align:center; color:var(--text-light); font-size:15px;">✗</td>
+              </tr>
+              <tr>
+                <td>Point grant</td>
+                <td style="text-align:center; color:var(--green-dark); font-weight:700; font-size:15px;">✓</td>
+                <td style="text-align:center; color:var(--green-dark); font-weight:700; font-size:15px;">✓</td>
+                <td style="text-align:center; color:var(--text-light); font-size:15px;">✗</td>
+              </tr>
+              <tr>
+                <td>Announcement delivery</td>
+                <td style="text-align:center; color:var(--green-dark); font-weight:700; font-size:15px;">✓</td>
+                <td style="text-align:center; color:var(--green-dark); font-weight:700; font-size:15px;">✓</td>
+                <td style="text-align:center; color:var(--text-light); font-size:15px;">✗</td>
+              </tr>
+              <tr>
+                <td>Change settings</td>
+                <td style="text-align:center; color:var(--green-dark); font-weight:700; font-size:15px;">✓</td>
+                <td style="text-align:center; color:var(--text-light); font-size:15px;">✗</td>
+                <td style="text-align:center; color:var(--text-light); font-size:15px;">✗</td>
+              </tr>
+              <tr>
+                <td>Account management</td>
+                <td style="text-align:center; color:var(--green-dark); font-weight:700; font-size:15px;">✓</td>
+                <td style="text-align:center; color:var(--text-light); font-size:15px;">✗</td>
+                <td style="text-align:center; color:var(--text-light); font-size:15px;">✗</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Login audit log -->
+        <div class="card">
+          <div class="sec-title">📋 Login audit log (latest 10)</div>
+          <div style="display:flex; flex-direction:column; gap:6px; max-height:380px; overflow-y:auto;">
+            <div style="display:flex; justify-content:space-between; padding:8px 10px; background:var(--green-pale); border-radius:6px; font-size:12px;">
+              <div><strong>Keiko Yamamoto</strong> Login</div>
+              <div style="color:var(--text-light);">2026/6/28 14:30</div>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:8px 10px; background:var(--bg); border-radius:6px; font-size:12px;">
+              <div><strong>Shuichi Tamura</strong> Login</div>
+              <div style="color:var(--text-light);">2026/6/27 9:15</div>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:8px 10px; background:var(--bg); border-radius:6px; font-size:12px;">
+              <div><strong>Misaki Suzuki</strong> Login</div>
+              <div style="color:var(--text-light);">2026/6/26 16:42</div>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:8px 10px; background:var(--bg); border-radius:6px; font-size:12px;">
+              <div><strong>Keiko Yamamoto</strong> Execute point grant (318 people)</div>
+              <div style="color:var(--text-light);">2026/6/26 17:30</div>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:8px 10px; background:var(--bg); border-radius:6px; font-size:12px;">
+              <div><strong>Shuichi Tamura</strong> Log out</div>
+              <div style="color:var(--text-light);">2026/6/25 18:05</div>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:8px 10px; background:var(--bg); border-radius:6px; font-size:12px;">
+              <div><strong>Keiko Yamamoto</strong> Change settings</div>
+              <div style="color:var(--text-light);">2026/6/25 15:22</div>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:8px 10px; background:var(--bg); border-radius:6px; font-size:12px;">
+              <div><strong>Hiroshi Sasaki</strong> Login</div>
+              <div style="color:var(--text-light);">2026/6/20 11:00</div>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:8px 10px; background:var(--bg); border-radius:6px; font-size:12px;">
+              <div><strong>Misaki Suzuki</strong> Send announcement</div>
+              <div style="color:var(--text-light);">2026/6/15 10:02</div>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:8px 10px; background:var(--bg); border-radius:6px; font-size:12px;">
+              <div><strong>Keiko Yamamoto</strong> Login</div>
+              <div style="color:var(--text-light);">2026/6/15 9:45</div>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:8px 10px; background:var(--red-pale); border-radius:6px; font-size:12px;">
+              <div><strong>Unknown</strong> <span style="color:var(--red); font-weight:700;">Login failed</span> (3 times)</div>
+              <div style="color:var(--text-light);">2026/6/14 22:11</div>
+            </div>
+          </div>
+          <div style="margin-top:12px;">
+            <a href="#" class="btn btn-ghost" style="font-size:11px; width:100%; justify-content:center;" onclick="event.preventDefault(); alert('Download the full login audit log as CSV.')">📥 Download all logs as CSV</a>
+          </div>
+        </div>
+      </div>
+    </div><!-- /page-access -->
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /layout -->
+
+<!-- ===== HEALTH RESULT INPUT MODAL ===== -->
+<div class="modal-overlay" id="resultModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <h3 id="modal-title">📋 Enter check-up results — Masao Tanaka</h3>
+        <div class="mh-sub" id="modal-sub">ID:1084 / Age 75 · Male / North Shingu / July 12 Specific Health Check-up</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- Blood pressure -->
+      <div class="modal-section-title">🩺 Blood pressure</div>
+      <div class="form-grid cols3">
+        <div class="form-group">
+          <label class="form-label">Systolic (upper) <span class="unit">mmHg</span></label>
+          <input class="form-input" type="number" id="bp-sys" placeholder="e.g., 138" oninput="checkBP()">
+          <span class="form-hint" id="bp-sys-hint"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Diastolic (lower) <span class="unit">mmHg</span></label>
+          <input class="form-input" type="number" id="bp-dia" placeholder="e.g., 88" oninput="checkBP()">
+          <span class="form-hint" id="bp-dia-hint"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Rating</label>
+          <div class="form-input" id="bp-eval" style="background:var(--bg); color:var(--text-light); font-size:12px;">Awaiting entry</div>
+        </div>
+      </div>
+
+      <!-- Body measurements -->
+      <div class="modal-section-title">⚖️ Body measurements</div>
+      <div class="form-grid cols3">
+        <div class="form-group">
+          <label class="form-label">Height <span class="unit">cm</span></label>
+          <input class="form-input" type="number" id="height" placeholder="e.g., 163.0" step="0.1" oninput="calcBMI()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Weight <span class="unit">kg</span></label>
+          <input class="form-input" type="number" id="weight" placeholder="e.g., 64.5" step="0.1" oninput="calcBMI()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">BMI (auto-calculated)</label>
+          <div class="bmi-display" id="bmi-display">—</div>
+          <span class="form-hint" id="bmi-hint"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Waist circumference <span class="unit">cm</span></label>
+          <input class="form-input" type="number" id="waist" placeholder="e.g., 84.0" step="0.1">
+          <span class="form-hint" id="waist-hint"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Body temp <span class="unit">℃</span></label>
+          <input class="form-input" type="number" id="temp" placeholder="e.g., 36.5" step="0.1">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Pulse <span class="unit">bpm</span></label>
+          <input class="form-input" type="number" id="pulse" placeholder="e.g., 72">
+        </div>
+      </div>
+
+      <!-- Blood test -->
+      <div class="modal-section-title">🔬 Blood & urine test</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Fasting blood glucose <span class="unit">mg/dL</span></label>
+          <input class="form-input" type="number" id="glucose" placeholder="e.g., 98" oninput="checkGlucose()">
+          <span class="form-hint" id="glucose-hint"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">HbA1c <span class="unit">%</span></label>
+          <input class="form-input" type="number" id="hba1c" placeholder="e.g., 5.6" step="0.1">
+        </div>
+        <div class="form-group">
+          <label class="form-label">LDL cholesterol <span class="unit">mg/dL</span></label>
+          <input class="form-input" type="number" id="ldl" placeholder="e.g., 118" oninput="checkLDL()">
+          <span class="form-hint" id="ldl-hint"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Triglycerides <span class="unit">mg/dL</span></label>
+          <input class="form-input" type="number" id="tg" placeholder="e.g., 105">
+        </div>
+        <div class="form-group">
+          <label class="form-label">HDL cholesterol <span class="unit">mg/dL</span></label>
+          <input class="form-input" type="number" id="hdl" placeholder="e.g., 62">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Urine protein</label>
+          <select class="form-select" id="urine-protein">
+            <option value="">Please select</option>
+            <option value="minus">Negative (−)</option>
+            <option value="plus1">Weak positive (±)</option>
+            <option value="plus2">Positive (+)</option>
+            <option value="plus3">Strong positive (++)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Assessment -->
+      <div class="modal-section-title">📝 Counselor assessment & memo</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Perceived health condition (self-reported)</label>
+          <select class="form-select">
+            <option value="">Please select</option>
+            <option value="5">Very good</option>
+            <option value="4">Good</option>
+            <option value="3">Normal</option>
+            <option value="2">Not very good</option>
+            <option value="1">Poor</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Counselor in charge</label>
+          <select class="form-select">
+            <option>Keiko Yamamoto (nurse)</option>
+            <option>Miho Tanaka (public health nurse)</option>
+            <option>Kenta Suzuki (doctor)</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Recent worries / concerns (self-reported)</label>
+          <textarea class="form-textarea" placeholder="e.g., bothered by knee pain, waking up at night more often, etc.…"></textarea>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Tendencies during small talk / counselor memo</label>
+          <textarea class="form-textarea" placeholder="e.g., His expression brightened at the topic of vegetable exchange. Talk of conversations with family came up. There were a few comments about loneliness…"></textarea>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Overall assessment</label>
+          <textarea class="form-textarea" placeholder="Please enter an assessment of the overall health condition…"></textarea>
+        </div>
+      </div>
+
+      <!-- Follow-up required -->
+      <div style="margin-top:14px; padding:12px 16px; background:var(--orange-pale); border:1.5px solid #e8c090; border-radius:10px;">
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px; font-weight:600; color:var(--orange);">
+          <input type="checkbox" id="follow-up" style="width:16px; height:16px;">
+          ⚠️ Follow-up required (progress check needed at the next check-up)
+        </label>
+      </div>
+
+      <!-- PDF attachment -->
+      <div class="modal-section-title" style="margin-top:18px;">📎 Counseling Results PDF</div>
+      <div id="modal-pdf-dropzone" class="pdf-dropzone"
+           ondragover="event.preventDefault(); this.classList.add('drag-over')"
+           ondragleave="this.classList.remove('drag-over')"
+           ondrop="handlePDFDrop(event)">
+        <div style="font-size:28px; margin-bottom:8px;">📄</div>
+        <div style="font-size:13px; font-weight:600; color:var(--text-light); margin-bottom:6px;">Drag & drop a PDF here</div>
+        <div style="font-size:12px; color:#aaa; margin-bottom:12px;">or</div>
+        <label style="cursor:pointer;">
+          <span class="btn btn-ghost" style="font-size:12px; padding:6px 14px;">📂 Choose a file</span>
+          <input type="file" accept="application/pdf" style="display:none;" onchange="handlePDFUpload(this)">
+        </label>
+      </div>
+      <div id="modal-pdf-strip" class="pdf-attached-strip">
+        <span style="font-size:20px;">📄</span>
+        <div style="flex:1; min-width:0;">
+          <div id="modal-pdf-name" style="font-size:13px; font-weight:600; color:var(--navy); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"></div>
+          <div id="modal-pdf-size" style="font-size:11px; color:var(--text-light); margin-top:2px;"></div>
+        </div>
+        <button class="btn btn-ghost" style="font-size:12px; padding:5px 12px;" onclick="previewModalPDF()">👁 Preview</button>
+        <button class="btn" style="font-size:12px; padding:5px 12px; background:var(--red,#e74c3c); color:#fff; border:none;" onclick="removeModalPDF()">✕ Delete</button>
+      </div>
+
+    </div><!-- /modal-body -->
+
+    <div class="modal-footer">
+      <label class="participation-toggle" onclick="toggleAttended(this)">
+        <div class="toggle-check checked" id="attended-toggle">✓</div>
+        <span id="attended-label">Record as participated</span>
+      </label>
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-green" onclick="saveResult()">💾 Save results</button>
+    </div>
+  </div>
+</div>
+
+<!-- PDF Viewer Overlay -->
+<div id="pdfViewerModal" class="pdf-viewer-overlay" onclick="if(event.target===this) closePDFViewer()">
+  <div class="pdf-viewer-box">
+    <div class="pdf-viewer-header">
+      <div>
+        <div style="font-size:14px; font-weight:700;" id="pdf-viewer-name">Counseling Results PDF</div>
+        <div style="font-size:12px; opacity:0.75; margin-top:2px;" id="pdf-viewer-sub"></div>
+      </div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <button id="pdf-download-btn" class="btn btn-ghost" style="font-size:12px; padding:5px 14px; color:#fff; border-color:rgba(255,255,255,0.4);" onclick="downloadPDF()">⬇ Download</button>
+        <button style="background:none; border:none; color:#fff; font-size:22px; cursor:pointer; line-height:1;" onclick="closePDFViewer()">✕</button>
+      </div>
+    </div>
+    <div id="pdf-viewer-content" style="flex:1; overflow:hidden; display:flex; flex-direction:column;">
+      <!-- PDF placeholder (sample) -->
+      <div id="pdf-placeholder" class="pdf-placeholder">
+        <div style="font-size:56px; margin-bottom:16px;">📄</div>
+        <div style="font-size:16px; font-weight:700; color:var(--navy); margin-bottom:8px;" id="pdf-ph-title">Counseling results</div>
+        <div style="font-size:13px; color:var(--text-light); text-align:center; max-width:320px; line-height:1.7;" id="pdf-ph-desc">
+          This demo displays a preview of the PDF file.<br>Once an actual file is uploaded, it will be displayed here.
+        </div>
+        <div style="margin-top:24px; padding:16px 20px; background:#f4f7ff; border-radius:12px; font-size:12px; color:var(--text-light); text-align:left; min-width:280px;">
+          <div style="font-weight:700; margin-bottom:8px; color:var(--navy-mid);">📋 Sample diagnostic summary</div>
+          <div id="pdf-ph-summary" style="line-height:1.8;"></div>
+        </div>
+      </div>
+      <!-- Actual PDF iframe (shown when real file is loaded) -->
+      <iframe id="pdf-viewer-frame" class="pdf-viewer-frame" style="display:none;"></iframe>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ===== PAGE NAVIGATION ===== */
+  document.addEventListener('DOMContentLoaded', () => {
+    // Nav page switching
+    document.querySelectorAll('nav a[data-page]').forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        const target = link.dataset.page;
+
+        // Update nav active
+        document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+        link.classList.add('active');
+
+        // Update topbar title
+        const titles = {
+          dashboard:    'Dashboard — June 2026',
+          participants: 'Participant management — July 12 Specific Health Check-up',
+          schedule:     'Check-up schedule management',
+          points:       'Point grant management',
+          stats:        'Statistics & analysis report',
+          farmers:      'Farm coordination management',
+          notices:      'Announcement & message delivery',
+          settings:     'System settings',
+          access:       'Access permission management'
+        };
+        document.querySelector('.topbar-left h2').textContent = titles[target] || 'Dashboard';
+
+        // Show/hide pages
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        const page = document.getElementById('page-' + target);
+        if (page) page.classList.add('active');
+      });
+    });
+
+    // Dashboard tab switching
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const bar = tab.closest('.tab-bar');
+        bar.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+      });
+    });
+
+    // Participant page search/filter
+    const search = document.getElementById('pm-search');
+    const filter = document.getElementById('pm-filter');
+    if (search) search.addEventListener('input', filterTable);
+    if (filter) filter.addEventListener('change', filterTable);
+
+    // Close modal on overlay click
+    document.getElementById('resultModal').addEventListener('click', e => {
+      if (e.target === document.getElementById('resultModal')) closeModal();
+    });
+  });
+
+  function filterTable() {
+    const q = document.getElementById('pm-search').value.toLowerCase();
+    const f = document.getElementById('pm-filter').value;
+    document.querySelectorAll('#pm-tbody tr').forEach(tr => {
+      const text   = tr.textContent.toLowerCase();
+      const status = tr.dataset.status || '';
+      const matchQ = !q || text.includes(q);
+      const matchF = !f || status === f;
+      tr.style.display = matchQ && matchF ? '' : 'none';
+    });
+  }
+
+  /* ===== DASHBOARD FUNCTIONS ===== */
+  function issuePoints(btn, name) {
+    if (confirm(`Grant check-up participation points (+50pt) to ${name}?`)) {
+      const td = btn.closest('td').previousElementSibling;
+      td.innerHTML = '<span class="pts-issued">🌟 +50pt issued</span>';
+      btn.closest('.action-btns').innerHTML =
+        '<button class="action-btn">Details</button>' +
+        '<button class="action-btn btn-outline-red">Cancel</button>';
+      btn.closest('tr').querySelector('.status-badge').className = 'status-badge attended';
+      btn.closest('tr').querySelector('.status-badge').textContent = '✅ Participated';
+    }
+  }
+
+  function sendReminder(name) {
+    alert(`📩 Reminder sent to ${name}.`);
+  }
+
+  function bulkIssue(e) {
+    e.preventDefault();
+    if (confirm('Bulk-grant a total of 15,900pt to 318 people. Are you sure?'))
+      alert('✅ Executed bulk point grant.\nTarget: 318 people × 50pt = 15,900pt');
+  }
+
+  function sendReminders(e) {
+    e.preventDefault();
+    if (confirm('Send a bulk reminder to the 37 non-participants?'))
+      alert('📩 Sent a reminder to 37 people.');
+  }
+
+  /* ===== RESULT INPUT MODAL ===== */
+  let currentRow = null;
+
+  function openModal(name, id, hasData) {
+    document.getElementById('modal-title').textContent =
+      (hasData ? '✏️ Review/edit check-up results — ' : '📝 Enter check-up results — ') + name + ' ';
+    document.getElementById('modal-sub').textContent =
+      `ID:${id} / July 12 Specific Health Check-up / Shingu Civic Hall`;
+
+    // Pre-fill sample data if editing existing result
+    if (hasData) {
+      if (id === '0922') {
+        setVal('bp-sys', 118); setVal('bp-dia', 74);
+        setVal('height', 157); setVal('weight', 52.3); setVal('waist', 76);
+        setVal('glucose', 98); setVal('ldl', 105); setVal('hdl', 68); setVal('tg', 88);
+        setVal('temp', 36.4); setVal('pulse', 68);
+      } else if (id === '1310') {
+        setVal('bp-sys', 145); setVal('bp-dia', 90);
+        setVal('height', 167); setVal('weight', 67.8); setVal('waist', 90);
+        setVal('glucose', 118); setVal('ldl', 138); setVal('hdl', 52); setVal('tg', 142);
+        setVal('temp', 36.6); setVal('pulse', 74);
+        document.getElementById('follow-up').checked = true;
+      } else if (id === '0633') {
+        setVal('bp-sys', 122); setVal('bp-dia', 78);
+        setVal('height', 152); setVal('weight', 62.6); setVal('waist', 82);
+        setVal('glucose', 95); setVal('ldl', 112); setVal('hdl', 61); setVal('tg', 98);
+      }
+      checkBP(); calcBMI(); checkGlucose(); checkLDL();
+    } else {
+      // Clear form
+      ['bp-sys','bp-dia','height','weight','waist','glucose','hba1c','ldl','tg','hdl','temp','pulse']
+        .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+      document.getElementById('follow-up').checked = false;
+      document.getElementById('bmi-display').textContent = '—';
+      document.getElementById('bmi-display').style.color = '';
+      ['bp-sys-hint','bp-dia-hint','bmi-hint','glucose-hint','ldl-hint','bp-eval']
+        .forEach(id => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          el.textContent = id === 'bp-eval' ? 'Awaiting entry' : '';
+          if (id === 'bp-eval') { el.style.color = 'var(--text-light)'; el.style.background = 'var(--bg)'; }
+        });
+      ['bp-sys','bp-dia'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.classList.remove('warn','alert'); }
+      });
+    }
+
+    // Find clicked row for later update
+    const rows = document.querySelectorAll('#pm-tbody tr');
+    rows.forEach(tr => {
+      if (tr.textContent.includes(name)) currentRow = tr;
+    });
+
+    // Reset PDF upload area
+    modalPDFData = null;
+    const dropzone = document.getElementById('modal-pdf-dropzone');
+    const strip    = document.getElementById('modal-pdf-strip');
+    if (dropzone) dropzone.style.display = '';
+    if (strip)    strip.classList.remove('visible');
+    // Pre-fill if this person already has a PDF stored
+    if (hasData && typeof pdfStore !== 'undefined' && pdfStore[id]) {
+      modalPDFData = pdfStore[id];
+      if (dropzone) dropzone.style.display = 'none';
+      if (strip)    strip.classList.add('visible');
+      const nameEl = document.getElementById('modal-pdf-name');
+      const sizeEl = document.getElementById('modal-pdf-size');
+      if (nameEl) nameEl.textContent = pdfStore[id].fileName;
+      if (sizeEl) sizeEl.textContent = pdfStore[id].size;
+    }
+
+    const attendedToggle = document.getElementById('attended-toggle');
+    const attendedLabel  = document.getElementById('attended-label');
+    attendedToggle.classList.add('checked');
+    attendedToggle.textContent = '✓';
+    attendedLabel.textContent  = 'Record as participated';
+
+    document.getElementById('resultModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    document.getElementById('resultModal').classList.remove('open');
+    document.body.style.overflow = '';
+    currentRow = null;
+  }
+
+  function setVal(id, val) {
+    const el = document.getElementById(id);
+    if (el) el.value = val;
+  }
+
+  function checkBP() {
+    const sys  = +document.getElementById('bp-sys').value;
+    const dia  = +document.getElementById('bp-dia').value;
+    const eval_el = document.getElementById('bp-eval');
+    const sysEl   = document.getElementById('bp-sys');
+    const diaEl   = document.getElementById('bp-dia');
+    const sysHint = document.getElementById('bp-sys-hint');
+
+    if (!sys || !dia) { eval_el.textContent = 'Awaiting entry'; eval_el.style.color = 'var(--text-light)'; return; }
+
+    sysEl.classList.remove('warn','alert');
+    diaEl.classList.remove('warn','alert');
+
+    let label = '', color = '', bg = '';
+    if (sys >= 180 || dia >= 110) {
+      label = 'Grade III hypertension — detailed examination required'; color = 'var(--red)'; bg = 'var(--red-pale)';
+      sysEl.classList.add('alert'); diaEl.classList.add('alert');
+      sysHint.textContent = '⚠️ A very high value. Please recommend seeing a doctor.';
+      sysHint.className = 'form-hint warn';
+    } else if (sys >= 160 || dia >= 100) {
+      label = 'Grade II hypertension — caution'; color = 'var(--red)'; bg = 'var(--red-pale)';
+      sysEl.classList.add('alert');
+      sysHint.textContent = '⚠️ Hypertension. Please provide lifestyle guidance.';
+      sysHint.className = 'form-hint warn';
+    } else if (sys >= 140 || dia >= 90) {
+      label = 'Grade I hypertension — slightly high'; color = 'var(--orange)'; bg = 'var(--orange-pale)';
+      sysEl.classList.add('warn');
+      sysHint.textContent = '⚠️ Slightly high. Lifestyle improvement recommended.';
+      sysHint.className = 'form-hint warn';
+    } else if (sys >= 130 || dia >= 80) {
+      label = 'High-normal blood pressure — observation needed'; color = '#b89a1a'; bg = 'var(--gold-light)';
+      sysHint.textContent = 'Follow-up observation is recommended.';
+      sysHint.className = 'form-hint';
+    } else {
+      label = 'Normal blood pressure ✅'; color = 'var(--green-dark)'; bg = 'var(--green-pale)';
+      sysHint.textContent = 'Within normal range.';
+      sysHint.className = 'form-hint ok';
+    }
+    eval_el.textContent = label;
+    eval_el.style.color = color;
+    eval_el.style.background = bg;
+    eval_el.style.fontWeight = '700';
+    eval_el.style.fontSize = '12px';
+  }
+
+  function calcBMI() {
+    const h = +document.getElementById('height').value / 100;
+    const w = +document.getElementById('weight').value;
+    const display = document.getElementById('bmi-display');
+    const hint    = document.getElementById('bmi-hint');
+    const waist   = +document.getElementById('waist').value;
+    const waistHint = document.getElementById('waist-hint');
+
+    if (h > 0 && w > 0) {
+      const bmi = (w / (h * h)).toFixed(1);
+      display.textContent = bmi;
+      let color = '', msg = '';
+      if (bmi < 18.5)      { color = 'var(--orange)'; msg = 'Underweight'; }
+      else if (bmi < 25.0) { color = 'var(--green-dark)'; msg = 'Normal weight ✅'; }
+      else if (bmi < 30.0) { color = 'var(--orange)'; msg = 'Overweight ⚠️'; }
+      else                 { color = 'var(--red)';    msg = 'Obese ⚠️'; }
+      display.style.color = color;
+      hint.textContent = msg;
+      hint.className = (bmi >= 25 ? 'form-hint warn' : 'form-hint ok');
+    } else {
+      display.textContent = '—';
+      display.style.color = '';
+      hint.textContent = '';
+    }
+
+    if (waist > 0) {
+      const isMale = true; // TODO: use gender field
+      const limit = isMale ? 85 : 90;
+      waistHint.textContent = waist >= limit
+        ? `⚠️ Exceeds threshold (${limit}cm) — metabolic risk` : 'Within normal range ✅';
+      waistHint.className = waist >= limit ? 'form-hint warn' : 'form-hint ok';
+    }
+  }
+
+  function checkGlucose() {
+    const g = +document.getElementById('glucose').value;
+    const hint = document.getElementById('glucose-hint');
+    const input = document.getElementById('glucose');
+    if (!g) { hint.textContent = ''; return; }
+    input.classList.remove('warn','alert');
+    if (g >= 126) {
+      hint.textContent = '⚠️ Diabetic type (detailed examination recommended)';
+      hint.className = 'form-hint warn'; input.classList.add('alert');
+    } else if (g >= 110) {
+      hint.textContent = '⚠️ Borderline type — lifestyle improvement recommended';
+      hint.className = 'form-hint warn'; input.classList.add('warn');
+    } else {
+      hint.textContent = 'Within normal range ✅';
+      hint.className = 'form-hint ok';
+    }
+  }
+
+  function checkLDL() {
+    const l = +document.getElementById('ldl').value;
+    const hint = document.getElementById('ldl-hint');
+    const input = document.getElementById('ldl');
+    if (!l) { hint.textContent = ''; return; }
+    input.classList.remove('warn','alert');
+    if (l >= 180) {
+      hint.textContent = '⚠️ High LDL — consultation with a doctor recommended';
+      hint.className = 'form-hint warn'; input.classList.add('alert');
+    } else if (l >= 140) {
+      hint.textContent = '⚠️ Slightly high — dietary guidance recommended';
+      hint.className = 'form-hint warn'; input.classList.add('warn');
+    } else {
+      hint.textContent = 'Within normal range ✅';
+      hint.className = 'form-hint ok';
+    }
+  }
+
+  function toggleAttended(label) {
+    const toggle = document.getElementById('attended-toggle');
+    const lbl    = document.getElementById('attended-label');
+    if (toggle.classList.contains('checked')) {
+      toggle.classList.remove('checked');
+      toggle.textContent = '';
+      lbl.textContent = 'Do not record as participated';
+    } else {
+      toggle.classList.add('checked');
+      toggle.textContent = '✓';
+      lbl.textContent = 'Record as participated';
+    }
+  }
+
+  function saveResult() {
+    const sys  = document.getElementById('bp-sys').value;
+    const dia  = document.getElementById('bp-dia').value;
+    const bmi  = document.getElementById('bmi-display').textContent;
+    const name = document.getElementById('modal-title').textContent.replace(/^[^\-]+— /, '').replace(' ','');
+    const isAttended = document.getElementById('attended-toggle').classList.contains('checked');
+    const needsFollow = document.getElementById('follow-up').checked;
+
+    if (!sys || !dia) { alert('Please enter the blood pressure.'); return; }
+
+    // Update the row in the participants table
+    if (currentRow) {
+      // Update status
+      const statusBadge = currentRow.querySelector('.status-badge');
+      if (isAttended) {
+        statusBadge.className = 'status-badge attended';
+        statusBadge.textContent = '✅ Participated';
+      }
+
+      // Update result preview
+      const preview = currentRow.querySelector('.result-preview');
+      if (preview) {
+        const bpClass = (+sys >= 140 || +dia >= 90) ? 'result-chip warn' : 'result-chip ok';
+        const bpWarn  = (+sys >= 140 || +dia >= 90) ? ' ⚠️' : '';
+        const bmiClass = bmi !== '—' && +bmi >= 25 ? 'result-chip warn' : 'result-chip ok';
+        preview.innerHTML =
+          `<span class="${bpClass}">BP ${sys}/${dia}${bpWarn}</span>` +
+          (bmi !== '—' ? `<span class="${bmiClass}">BMI ${bmi}</span>` : '') +
+          (needsFollow ? '<span class="result-chip warn">⚠️ Follow-up required</span>' : '');
+      }
+
+      // Update result button
+      const btn = currentRow.querySelector('.btn-input-result');
+      if (btn) {
+        btn.className = 'btn-input-result done';
+        btn.textContent = '✏️ Review/edit results';
+        btn.onclick = () => openModal(name, '', true);
+      }
+
+      // Update pt column
+      const ptTd = currentRow.cells[4];
+      if (ptTd && isAttended) ptTd.innerHTML = '<span class="pts-issued">🌟 +50pt</span>';
+
+      // Mark row status
+      currentRow.dataset.status = 'entered';
+    }
+
+    // Save PDF to row if one was uploaded in this modal session
+    if (currentRow && modalPDFData) {
+      const pdfCell = currentRow.querySelector('.pdf-cell');
+      if (pdfCell) {
+        pdfCell.innerHTML = `<span class="pdf-badge" onclick="openPDFViewer('${name}', '${currentRow.dataset.pdfUid || ''}')">📄 View PDF</span>`;
+      }
+      // Store the PDF data keyed by uid
+      const uid = currentRow.querySelector('.pdf-cell')?.dataset?.uid;
+      if (uid) pdfStore[uid] = { ...modalPDFData, name };
+    }
+
+    closeModal();
+    alert(`✅ ${name}’s check-up results saved.${needsFollow ? '\n⚠️ Marked as requiring follow-up.' : ''}`);
+  }
+
+  /* ===== PDF FEATURE ===== */
+  // Store: uid -> { blobUrl, fileName, size }
+  const pdfStore = {
+    '0922': { fileName: 'Kazuko_Sato_Counseling_Results_2026-06.pdf', size: '256 KB', blobUrl: null },
+    '1310': { fileName: 'Shigeru_Nakamura_Counseling_Results_2026-06.pdf',   size: '198 KB', blobUrl: null },
+    '0633': { fileName: 'Reiko_Matsumoto_Counseling_Results_2026-06.pdf', size: '312 KB', blobUrl: null },
+  };
+  const sampleSummaries = {
+    '0922': 'BP: within normal range ✅\nWeight: 55.2kg, BMI 22.1 ✅\nSteps: avg 7,240 steps/day\nConcerns: reports decline in sleep quality\nFindings: Generally good. Continued exercise recommended.',
+    '1310': 'BP: 145/90 ⚠️ Caution\nWeight: 67.8kg, BMI 24.2 ✅\nGlucose: 118mg/dL ⚠️\nConcerns: need to confirm hypertension-medication use\nFindings: Lifestyle review recommended.',
+    '0633': 'BP: 122/78 ✅\nWeight: 68.4kg, BMI 27.1 ⚠️\nGlucose: 95mg/dL ✅\nConcerns: weight management is a challenge\nFindings: Dietary restriction and aerobic exercise recommended.',
+  };
+
+  let modalPDFData = null; // PDF uploaded in the current modal session
+  let currentPDFBlobUrl = null; // URL currently loaded in viewer
+
+  function handlePDFUpload(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const blob = new Blob([e.target.result], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      modalPDFData = { blobUrl: url, fileName: file.name, size: formatSize(file.size) };
+      showModalPDFStrip(file.name, formatSize(file.size));
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  function handlePDFDrop(event) {
+    event.preventDefault();
+    document.getElementById('modal-pdf-dropzone').classList.remove('drag-over');
+    const file = event.dataTransfer.files[0];
+    if (!file || file.type !== 'application/pdf') {
+      alert('Only PDF files are supported.');
+      return;
+    }
+    const input = { files: [file] };
+    handlePDFUpload(input);
+  }
+
+  function showModalPDFStrip(name, size) {
+    document.getElementById('modal-pdf-dropzone').style.display = 'none';
+    const strip = document.getElementById('modal-pdf-strip');
+    strip.classList.add('visible');
+    document.getElementById('modal-pdf-name').textContent = name;
+    document.getElementById('modal-pdf-size').textContent = size;
+  }
+
+  function removeModalPDF() {
+    modalPDFData = null;
+    document.getElementById('modal-pdf-dropzone').style.display = '';
+    document.getElementById('modal-pdf-strip').classList.remove('visible');
+  }
+
+  function previewModalPDF() {
+    if (modalPDFData) openPDFViewerWithURL(modalPDFData.fileName, modalPDFData.blobUrl, null);
+  }
+
+  function openPDFViewer(personName, uid) {
+    const data = pdfStore[uid];
+    document.getElementById('pdf-viewer-name').textContent = `${personName} — Counseling Results PDF`;
+    document.getElementById('pdf-viewer-sub').textContent = data ? data.fileName : '';
+
+    const placeholder = document.getElementById('pdf-placeholder');
+    const frame = document.getElementById('pdf-viewer-frame');
+
+    if (data && data.blobUrl) {
+      placeholder.style.display = 'none';
+      frame.style.display = 'block';
+      frame.src = data.blobUrl;
+      currentPDFBlobUrl = data.blobUrl;
+    } else {
+      // Show placeholder with sample data
+      placeholder.style.display = 'flex';
+      frame.style.display = 'none';
+      const summary = sampleSummaries[uid] || 'No diagnostic data found.';
+      document.getElementById('pdf-ph-title').textContent = `${personName} Diagnostic Summary`;
+      document.getElementById('pdf-ph-desc').innerHTML = `${data ? data.fileName : '(sample display)'}<br><span style="font-size:11px; color:#aaa;">You can view it by uploading an actual PDF file from the modal</span>`;
+      document.getElementById('pdf-ph-summary').innerHTML = summary.replace(/\n/g, '<br>');
+      currentPDFBlobUrl = null;
+    }
+
+    document.getElementById('pdfViewerModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function openPDFViewerWithURL(fileName, blobUrl, uid) {
+    document.getElementById('pdf-viewer-name').textContent = fileName;
+    document.getElementById('pdf-viewer-sub').textContent = 'Preview of the uploaded file';
+
+    const placeholder = document.getElementById('pdf-placeholder');
+    const frame = document.getElementById('pdf-viewer-frame');
+
+    placeholder.style.display = 'none';
+    frame.style.display = 'block';
+    frame.src = blobUrl;
+    currentPDFBlobUrl = blobUrl;
+
+    document.getElementById('pdfViewerModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closePDFViewer() {
+    document.getElementById('pdfViewerModal').classList.remove('open');
+    document.getElementById('pdf-viewer-frame').src = '';
+    document.body.style.overflow = '';
+    currentPDFBlobUrl = null;
+  }
+
+  function downloadPDF() {
+    if (!currentPDFBlobUrl) {
+      alert('No downloadable PDF file is available.\n(This is a sample display, so no actual file exists)');
+      return;
+    }
+    const a = document.createElement('a');
+    a.href = currentPDFBlobUrl;
+    a.download = document.getElementById('pdf-viewer-name').textContent + '.pdf';
+    a.click();
+  }
+
+  function formatSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(0) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  }
+
+</script>
+</body>
+</html>
